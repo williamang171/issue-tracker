@@ -57,7 +57,7 @@ public class IssuesController(
         return BadRequest("Failed to create issue");
     }
 
-    [HttpPut("{id}")]
+    [HttpPatch("{id}")]
     public async Task<IActionResult> UpdateIssue(Guid id, IssueUpdateDto dto)
     {
         var issue = await _issueRepo.GetIssueEntityById(id);
@@ -68,7 +68,7 @@ public class IssuesController(
         issue.Description = dto.Description ?? issue.Description;
         issue.Status = dto.Status ?? issue.Status;
         issue.Priority = dto.Priority ?? issue.Priority;
-        issue.Description = dto.Description ?? issue.Description;
+        issue.Type = dto.Type ?? issue.Type;
 
         if (await _issueRepo.SaveChangesAsync()) return Ok();
 

@@ -1,78 +1,49 @@
-import GoogleProvider from "next-auth/providers/google";
-import Auth0Provider from "next-auth/providers/auth0";
-import KeycloakProvider from "next-auth/providers/keycloak";
-import CredentialsProvider from "next-auth/providers/credentials";
-import type { Awaitable, User } from "next-auth";
+import NextAuth, { Profile } from "next-auth"
+import { OIDCConfig } from 'next-auth/providers'
+import DuendeIDS6Provider from "next-auth/providers/duende-identity-server6"
 
-const authOptions = {
-  // Configure one or more authentication providers
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  session: {
+    strategy: 'jwt'
+  },
   providers: [
-    // !!! Should be stored in .env file.
-    GoogleProvider({
-      clientId:
-        "1041339102270-e1fpe2b6v6u1didfndh7jkjmpcashs4f.apps.googleusercontent.com",
-      clientSecret: "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",
-    }),
-    Auth0Provider({
-      clientId: "AcinJvjWp1Dr41gPcJeQ20r5vcsteks4",
-      clientSecret:
-        "y3pj2KaTiNgING-5e8_JYmX_bIQSwvkp_XgDcA75sEPSSB2zmi0n-3UoTfH0pOTP",
-      issuer: "https://dev-y38p834gjptooc4g.us.auth0.com",
-    }),
-    KeycloakProvider({
-      clientId: "refine-demo",
-      clientSecret: "refine",
-      issuer: "https://lemur-0.cloud-iam.com/auth/realms/refine",
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name ?? profile.preferred_username,
-          email: profile.email,
-          image: "https://faces-img.xcdn.link/thumb-lorem-face-6312_thumb.jpg",
-        };
+    DuendeIDS6Provider({
+      id: 'id-server',
+      clientId: "nextApp",
+      clientSecret: "secret",
+      issuer: process.env.ID_URL,
+      authorization: {
+        params: { scope: 'openid profile issueTrackerApp' },
+        url: process.env.ID_URL + '/connect/authorize'
       },
-    }),
-    CredentialsProvider({
-      id: "CredentialsSignIn",
-      credentials: {},
-      async authorize(credentials: any) {
-        // TODO: Request your API to check credentials
-        console.log("CredentialsSignIn", JSON.stringify(credentials, null, 2));
-
-        // check credentials
-        // if not valid return null
-        if (credentials?.["email"] !== "demo@refine.dev") {
-          return null;
-        }
-
-        const user: Awaitable<User> = {
-          id: "1",
-          name: "John Doe",
-          email: "demo@refine.dev",
-          image: "https://i.pravatar.cc/300",
-        };
-        return user;
+      token: {
+        url: `${process.env.ID_URL}/connect/token`
       },
-    }),
-    CredentialsProvider({
-      id: "CredentialsSignUp",
-      credentials: {},
-      async authorize(credentials: any) {
-        // TODO: Request your API to create new user
-        console.log("CredentialsSignUp", JSON.stringify(credentials, null, 2));
-
-        // return mocked user
-        const user: Awaitable<User> = {
-          id: "1",
-          name: "John Doe",
-          email: "demo@refine.dev",
-          image: "https://i.pravatar.cc/300",
-        };
-        return user;
+      userinfo: {
+        url: `${process.env.ID_URL}/connect/token`
       },
-    }),
+      idToken: true
+    } as OIDCConfig<Omit<Profile, 'username'>>),
   ],
-  secret: "UItTuD1HcGXIj8ZfHUswhYdNd40Lc325R8VlxQPUoR0=",
-};
-
-export default authOptions;
+  callbacks: {
+    async authorized({ auth }) {
+      return !!auth
+    },
+    async jwt({ token, profile, account }) {
+      if (account && account.access_token) {
+        token.accessToken = account.access_token
+      }
+      if (profile) {
+        token.username = profile.username
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.username = token.username;
+        session.accessToken = token.accessToken;
+      }
+      return session;
+    }
+  }
+})

@@ -56,5 +56,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:80
+      - ClientApp=http://localhost:3000
     ports:
       - 6001:80

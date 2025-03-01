@@ -3,6 +3,7 @@ import React, { Suspense } from "react";
 import { RefineContext } from "./_refine_context";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { cookies } from "next/headers";
+import Navbar from "@components/nav/NavBar";
 
 export const metadata: Metadata = {
   title: "Refine",
@@ -25,7 +26,10 @@ export default function RootLayout({
       <body>
         <Suspense>
           <AntdRegistry>
-            <RefineContext defaultMode={theme?.value}>{children}</RefineContext>
+            <RefineContext defaultMode={theme?.value}>
+              <Navbar />
+              {children}
+            </RefineContext>
           </AntdRegistry>
         </Suspense>
       </body>
