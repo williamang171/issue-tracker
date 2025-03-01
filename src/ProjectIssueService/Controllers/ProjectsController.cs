@@ -53,7 +53,7 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper)
     }
 
     [Authorize]
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     public async Task<ActionResult> UpdateProject(Guid id, ProjectUpdateDto dto)
     {
         var project = await repo.GetProjectEntityById(id);
