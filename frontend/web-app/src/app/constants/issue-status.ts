@@ -1,4 +1,4 @@
-import { createConstantObject } from "../utilities/utils-constants";
+import { createConstantObject } from "../utils/utils-constants";
 
 export const OPEN = 0;
 export const IN_PROGRESS = 1;

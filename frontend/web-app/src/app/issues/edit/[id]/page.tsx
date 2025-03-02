@@ -3,7 +3,7 @@
 import { ISSUE_PRIORITY_ARRAY } from "@app/constants/issue-priority";
 import { ISSUE_STATUS_ARRAY } from "@app/constants/issue-status";
 import { ISSUE_TYPE_ARRAY } from "@app/constants/issue-type";
-import { mapToSelectItemObject } from "@app/utilities/uitils-select";
+import { mapToSelectItemObject } from "@app/utils/uitils-select";
 import { Edit, useForm, useSelect, } from "@refinedev/antd";
 import { Form, Input, Select } from "antd";
 

@@ -1,17 +1,17 @@
-"use client";
 
+"use client"
+
+import React from "react";
 import { useNotificationProvider } from "@refinedev/antd";
-import { type AuthBindings, GitHubBanner, Refine } from "@refinedev/core";
+import { type AuthBindings, Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import routerProvider from "@refinedev/nextjs-router";
 import { SessionProvider, signIn, signOut, useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
-import React from "react";
-import { axiosInstanceWithAuth } from "./utilities/axiosInstanceWithAuth";
-
 import { ColorModeContextProvider } from "@contexts/color-mode";
-import { dataProvider } from "@providers/data-provider";
+import { dataProvider } from "@providers/data-provider/data-provider.client";
 import "@refinedev/antd/dist/reset.css";
+import { axiosInstance } from "./utils/axios-instance";
+import { usePathname } from "next/navigation";
 
 type RefineContextProps = {
   defaultMode?: string;
@@ -21,7 +21,7 @@ export const RefineContext = (
   props: React.PropsWithChildren<RefineContextProps>,
 ) => {
   return (
-    <SessionProvider>
+    <SessionProvider refetchOnWindowFocus={false}>
       <App {...props} />
     </SessionProvider>
   );
@@ -31,13 +31,26 @@ type AppProps = {
   defaultMode?: string;
 };
 
-const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
+const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
   const { data, status } = useSession();
   const to = usePathname();
 
-  if (status === "loading") {
-    return <span>loading...</span>;
+  if (status === 'loading') {
+    return <div>Loading...</div>
   }
+
+  axiosInstance.interceptors.request.use(
+    async (config) => {
+      const token = data?.accessToken;
+      if (token && config?.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
   const authProvider: AuthBindings = {
     login: async ({ providerName, email, password }: any) => {
@@ -101,7 +114,7 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
       };
     },
     check: async () => {
-      if (status === "unauthenticated") {
+      if (status === 'unauthenticated') {
         return {
           authenticated: false,
           redirectTo: "/login",
@@ -128,19 +141,6 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
     },
   };
 
-  axiosInstanceWithAuth.interceptors.request.use(
-    async (config) => {
-      const token = data?.accessToken;
-      if (token && config?.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
-
   return (
     <>
       {/* <GitHubBanner /> */}
@@ -149,6 +149,7 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
           <Refine
             routerProvider={routerProvider}
             dataProvider={dataProvider}
+            // dataProvider={dataProviderServerInstance}
             notificationProvider={useNotificationProvider}
             authProvider={authProvider}
             resources={[

@@ -3,7 +3,7 @@
 import { ISSUE_PRIORITY } from "@app/constants/issue-priority";
 import { isKeyOfProjectIssueStatus, ISSUE_STATUS } from "@app/constants/issue-status";
 import { ISSUE_TYPE } from "@app/constants/issue-type";
-import { renderEnumFieldLabel } from "@app/utilities/utils-table-col-render";
+import { renderEnumFieldLabel } from "@app/utils/utils-table-col-render";
 import {
   DeleteButton,
   EditButton,

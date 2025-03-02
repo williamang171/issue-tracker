@@ -4,7 +4,7 @@ import { Create, useForm, useSelect } from "@refinedev/antd";
 import { Form, Input, InputNumber, Select } from "antd";
 import { ISSUE_STATUS_ARRAY } from "@app/constants/issue-status";
 import { ISSUE_TYPE_ARRAY } from "@app/constants/issue-type";
-import { mapToSelectItemObject } from "@app/utilities/uitils-select";
+import { mapToSelectItemObject } from "@app/utils/uitils-select";
 import { ISSUE_PRIORITY_ARRAY } from "@app/constants/issue-priority";
 
 export default function ProjectCreate() {
