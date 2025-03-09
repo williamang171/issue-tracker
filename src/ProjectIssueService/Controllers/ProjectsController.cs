@@ -1,17 +1,18 @@
-using ProjectIssueService.Data;
-using ProjectIssueService.DTOs;
-using ProjectIssueService.Entities;
 using AutoMapper;
-
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using ProjectIssueService.Data;
+using ProjectIssueService.DTOs;
+using ProjectIssueService.Entities;
+using Contracts;
 
 namespace ProjectIssueService.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProjectsController(IProjectRepository repo, IMapper mapper)
+public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublishEndpoint publishEndpoint)
     : ControllerBase
 {
     [Authorize]

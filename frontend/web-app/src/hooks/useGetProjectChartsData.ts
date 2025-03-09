@@ -16,60 +16,60 @@ export const useGetProjectChartsData = () => {
     const { id } = useParams();
     const projectId = (Array.isArray(id) ? id[0] : id);
 
-    // const { data: issueStatusCountData } = useOne<
-    //     {
-    //         status: number;
-    //         count: number;
-    //     }[]
-    // >({
-    //     resource: RESOURCE.dashboardIssuesStatusCount,
-    //     id: projectId,
-    // });
+    const { data: issueStatusCountData } = useOne<
+        {
+            key: number;
+            value: number;
+        }[]
+    >({
+        resource: RESOURCE.dashboardIssuesStatusCount,
+        id: projectId,
+    });
 
-    // const { data: issuePriorityCountData } = useOne<
-    //     {
-    //         priority: number;
-    //         count: number;
-    //     }[]
-    // >({
-    //     resource: RESOURCE.dashboardIssuesStatusCount,
-    //     id: projectId,
-    // });
+    const { data: issuePriorityCountData } = useOne<
+        {
+            key: number;
+            value: number;
+        }[]
+    >({
+        resource: RESOURCE.dashboardIssuesPriorityCount,
+        id: projectId,
+    });
 
-    // const { data: issueTypeCountData } = useOne<
-    //     {
-    //         type: number;
-    //         count: number;
-    //     }[]
-    // >({
-    //     resource: RESOURCE.dashboardIssuesTypeCount,
-    //     id: projectId,
-    // });
+    const { data: issueTypeCountData } = useOne<
+        {
+            key: number;
+            value: number;
+        }[]
+    >({
+        resource: RESOURCE.dashboardIssuesTypeCount,
+        id: projectId,
+    });
 
     // TODO: replace with actual data
-    const issueStatusCountData = {
-        data: mockIssueStatusCountData
-    };
-    const issuePriorityCountData = {
-        data: mockIssuePriorityCountData
-    };
-    const issueTypeCountData = {
-        data: mockIssueTypeCountData
-    };
+    // const issueStatusCountData = {
+    //     data: mockIssueStatusCountData
+    // };
+    // const issuePriorityCountData = {
+    //     data: mockIssuePriorityCountData
+    // };
+    // const issueTypeCountData = {
+    //     data: mockIssueTypeCountData
+    // };
 
     const issueStatusCountDataForChart = useMemo(() => {
         if (!issueStatusCountData) {
             return [];
         }
         return issueStatusCountData.data.map((d) => {
-            const obj = getConstantObjectByKey(ISSUE_STATUS, d.status);
+            const obj = getConstantObjectByKey(ISSUE_STATUS, d.key);
             const label = obj?.label;
             const color = obj?.color;
 
             return {
-                value: d.count,
+                value: d.value,
                 name: label,
-                id: d.status,
+                id: d.key,
                 color,
             };
         });
@@ -80,14 +80,14 @@ export const useGetProjectChartsData = () => {
             return [];
         }
         return issuePriorityCountData.data.map((d) => {
-            const obj = getConstantObjectByKey(ISSUE_PRIORITY, d.priority);
+            const obj = getConstantObjectByKey(ISSUE_PRIORITY, d.key);
             const label = obj?.label;
             const color = obj?.color;
 
             return {
-                value: d.count,
+                value: d.value,
                 name: label,
-                id: d.priority,
+                id: d.key,
                 color,
             };
         });
@@ -98,14 +98,14 @@ export const useGetProjectChartsData = () => {
             return [];
         }
         return issueTypeCountData.data.map((d) => {
-            const obj = getConstantObjectByKey(ISSUE_TYPE, d.type);
-            const label = obj?.label || d.type;
+            const obj = getConstantObjectByKey(ISSUE_TYPE, d.key);
+            const label = obj?.label || d.key;
             const color = obj?.color;
-            getConstantObjectByKey(ISSUE_TYPE, d.type)?.label || d.type;
+            getConstantObjectByKey(ISSUE_TYPE, d.key)?.label || d.key;
             return {
-                value: d.count,
+                value: d.value,
                 name: label,
-                id: d.type,
+                id: d.key,
                 color: color,
             };
         });

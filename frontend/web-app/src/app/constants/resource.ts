@@ -5,8 +5,8 @@ export const RESOURCE = {
     projects: 'projects',
     users: 'users',
     roles: 'roles',
-    dashboardIssuesStatusCount: 'dashboard/issues-status-count',
-    dashboardIssuesPriorityCount: 'dashboard/issues-priority-count',
-    dashboardIssuesTypeCount: 'dashboard/issues-type-count',
+    dashboardIssuesStatusCount: 'issueStats/status',
+    dashboardIssuesPriorityCount: 'issueStats/priority',
+    dashboardIssuesTypeCount: 'issueStats/type',
     usersProjectUnassigned: 'users/projects-unassigned'
 }
