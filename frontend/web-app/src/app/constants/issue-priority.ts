@@ -1,4 +1,4 @@
-import { createConstantObject } from "../utilities/utils-constants";
+import { createConstantObject } from "../utils/utils-constants";
 
 export const LOW = 0;
 export const MEDIUM = 1;

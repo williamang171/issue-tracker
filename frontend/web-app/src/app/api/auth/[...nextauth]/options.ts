@@ -22,6 +22,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       userinfo: {
         url: `${process.env.ID_URL}/connect/token`
       },
+
       idToken: true
     } as OIDCConfig<Omit<Profile, 'username'>>),
   ],
@@ -38,12 +39,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token, }) {
       if (token) {
         session.user.username = token.username;
         session.accessToken = token.accessToken;
       }
       return session;
-    }
+    },
   }
 })

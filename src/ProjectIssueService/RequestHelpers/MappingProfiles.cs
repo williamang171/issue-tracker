@@ -1,6 +1,7 @@
 using AutoMapper;
 using ProjectIssueService.DTOs;
 using ProjectIssueService.Entities;
+using Contracts;
 namespace ProjectIssueService.RequestHelpers;
 
 public class MappingProfiles : Profile
@@ -14,6 +15,7 @@ public class MappingProfiles : Profile
         CreateMap<Project, ProjectCreateDto>();
         CreateMap<ProjectUpdateDto, Project>();
         CreateMap<Project, ProjectUpdateDto>();
+        CreateMap<ProjectDto, ProjectDeleted>();
 
         // Issue mappings
         CreateMap<Issue, IssueDto>();
@@ -22,5 +24,8 @@ public class MappingProfiles : Profile
         CreateMap<Issue, IssueCreateDto>();
         CreateMap<IssueUpdateDto, Issue>();
         CreateMap<Issue, IssueUpdateDto>();
+        CreateMap<IssueDto, IssueCreated>();
+        CreateMap<IssueDto, IssueValues>();
+        CreateMap<IssueDto, IssueDeleted>();
     }
 }

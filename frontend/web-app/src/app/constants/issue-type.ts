@@ -1,4 +1,4 @@
-import { createConstantObject } from "../utilities/utils-constants";
+import { createConstantObject } from "../utils/utils-constants";
 
 export const BUG = 0;
 export const FEATURE_REQUEST = 1;

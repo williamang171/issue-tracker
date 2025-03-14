@@ -7,8 +7,8 @@ export default function ProjectCreate() {
   const { formProps, saveButtonProps } = useForm({});
 
   return (
-    <Create saveButtonProps={saveButtonProps}>
-      <Form {...formProps} layout="vertical">
+    <Create saveButtonProps={saveButtonProps} >
+      <Form {...formProps} layout="vertical" >
         <Form.Item
           label={"Name"}
           name={["name"]}

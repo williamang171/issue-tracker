@@ -8,27 +8,27 @@ export function createConstantObject(key: number, label: string, color?: string)
 }
 
 export type ConstantObject = {
-    [key: string]: {
+    [key: number]: {
         label: string;
-        id: string;
+        id: number;
         color?: string;
     };
 };
 
 function isKeyOfObject<T extends ConstantObject>(
     obj: T,
-    key: string
-): key is Extract<keyof T, string> {
+    key: number
+): key is Extract<keyof T, number> {
     return Object.prototype.hasOwnProperty.call(obj, key);
 }
 
-export function getConstantObjectByKey<T extends ConstantObject>(obj: T, key: string) {
-    if (!key) {
+export function getConstantObjectByKey<T extends ConstantObject>(obj: T, key: number) {
+    if (key === undefined || key === null) {
         return;
     }
-    const keyNormalized = key.toLowerCase();
-    if (isKeyOfObject(obj, keyNormalized)) {
-        return obj[keyNormalized];
+
+    if (isKeyOfObject(obj, key)) {
+        return obj[key];
     }
     return;
 }
