@@ -29,14 +29,10 @@ builder.Services.AddMassTransit(x =>
             h.Password(builder.Configuration.GetValue("RabbitMQ:Password", "guest")!);
         });
 
-        // Additional configuration for retries
-        // cfg.ReceiveEndpoint("issue-stats-project-created", e =>
-        // {
-        //     e.UseMessageRetry(r => r.Interval(5, 5));
-        //     e.ConfigureConsumer<IssueCreatedConsumer>(context);
-        // });
-
         cfg.ConfigureEndpoints(context);
+
+        // Additional configuration for retries
+        cfg.UseMessageRetry(r => r.Interval(5, 5));
     });
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

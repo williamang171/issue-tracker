@@ -15,6 +15,7 @@ public class MappingProfiles : Profile
         CreateMap<Project, ProjectCreateDto>();
         CreateMap<ProjectUpdateDto, Project>();
         CreateMap<Project, ProjectUpdateDto>();
+        CreateMap<ProjectDto, ProjectDeleted>();
 
         // Issue mappings
         CreateMap<Issue, IssueDto>();

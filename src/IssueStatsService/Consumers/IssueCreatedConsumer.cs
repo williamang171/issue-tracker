@@ -13,19 +13,26 @@ public class IssueCreatedConsumer(IConnectionMultiplexer muxer) : IConsumer<Issu
         Console.WriteLine("--> Consuming Issue Created: " + context.Message.Id);
 
         // For Debugging
-        var messageJsonString = JsonSerializer.Serialize(context.Message, new JsonSerializerOptions { WriteIndented = true });
-        Console.WriteLine(messageJsonString);
+        // var messageJsonString = JsonSerializer.Serialize(context.Message, new JsonSerializerOptions { WriteIndented = true });
+        // Console.WriteLine(messageJsonString);
 
-        IDatabase db = muxer.GetDatabase();
         var message = context.Message;
         var projectId = message.ProjectId;
         var status = message.Status;
         var type = message.Type;
         var priority = message.Priority;
 
-        await db.HashIncrementAsync($"project:{projectId}:status-counts", status.ToString());
-        await db.HashIncrementAsync($"project:{projectId}:priority-counts", priority.ToString());
-        await db.HashIncrementAsync($"project:{projectId}:type-counts", type.ToString());
+        IDatabase db = muxer.GetDatabase();
+        ITransaction transaction = db.CreateTransaction();
+        _ = transaction.HashIncrementAsync($"project:{projectId}:status-counts", status.ToString());
+        _ = transaction.HashIncrementAsync($"project:{projectId}:priority-counts", priority.ToString());
+        _ = transaction.HashIncrementAsync($"project:{projectId}:type-counts", type.ToString());
+        bool committed = await transaction.ExecuteAsync();
+
+        if (!committed)
+        {
+            throw new RedisException("--> Failed to commit transaction when consuming Issue Created: " + context.Message.Id);
+        }
 
         Console.WriteLine("--> Consumed Issue Created: " + context.Message.Id);
     }

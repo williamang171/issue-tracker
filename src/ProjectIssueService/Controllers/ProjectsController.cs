@@ -7,6 +7,8 @@ using ProjectIssueService.Data;
 using ProjectIssueService.DTOs;
 using ProjectIssueService.Entities;
 using Contracts;
+using ProjectIssueService.Helpers;
+using ProjectIssueService.Extensions;
 
 namespace ProjectIssueService.Controllers;
 
@@ -17,9 +19,11 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
 {
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult<List<ProjectDto>>> GetAllProjects()
+    public async Task<ActionResult<List<ProjectDto>>> GetProjects([FromQuery] ProjectParams parameters)
     {
-        return await repo.GetProjectsAsync();
+        var response = await repo.GetProjectsPaginatedAsync(parameters);
+        Response.AddPaginationHeader(response.TotalCount);
+        return response;
     }
 
     [Authorize]
@@ -79,7 +83,11 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
 
         if (project == null) return NotFound();
 
+        var projectDto = mapper.Map<ProjectDto>(project);
+
         repo.RemoveProject(project);
+
+        await publishEndpoint.Publish(mapper.Map<ProjectDeleted>(projectDto));
 
         var result = await repo.SaveChangesAsync();
 

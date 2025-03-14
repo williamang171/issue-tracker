@@ -13,10 +13,9 @@ public class IssueUpdatedConsumer(IConnectionMultiplexer muxer) : IConsumer<Issu
         Console.WriteLine("--> Consuming Issue Updated: " + context.Message.Id);
 
         // For Debugging
-        var messageJsonString = JsonSerializer.Serialize(context.Message, new JsonSerializerOptions { WriteIndented = true });
-        Console.WriteLine(messageJsonString);
+        // var messageJsonString = JsonSerializer.Serialize(context.Message, new JsonSerializerOptions { WriteIndented = true });
+        // Console.WriteLine(messageJsonString);
 
-        IDatabase db = muxer.GetDatabase();
         var message = context.Message;
         var oldValues = message.OldValues;
         var newValues = message.NewValues;
@@ -28,22 +27,31 @@ public class IssueUpdatedConsumer(IConnectionMultiplexer muxer) : IConsumer<Issu
         var newType = newValues.Type;
         var newPriority = newValues.Priority;
 
+        IDatabase db = muxer.GetDatabase();
+        ITransaction transaction = db.CreateTransaction();
         if (oldStatus.HasValue && newStatus.HasValue && !oldStatus.Equals(newStatus))
         {
-            await db.HashDecrementAsync($"project:{projectId}:status-counts", oldStatus.ToString());
-            await db.HashIncrementAsync($"project:{projectId}:status-counts", newStatus.ToString());
+            _ = transaction.HashDecrementAsync($"project:{projectId}:status-counts", oldStatus.ToString());
+            _ = transaction.HashIncrementAsync($"project:{projectId}:status-counts", newStatus.ToString());
         }
 
         if (oldPriority.HasValue && newPriority.HasValue && !oldPriority.Equals(newPriority))
         {
-            await db.HashDecrementAsync($"project:{projectId}:priority-counts", oldPriority.ToString());
-            await db.HashIncrementAsync($"project:{projectId}:priority-counts", newPriority.ToString());
+            _ = transaction.HashDecrementAsync($"project:{projectId}:priority-counts", oldPriority.ToString());
+            _ = transaction.HashIncrementAsync($"project:{projectId}:priority-counts", newPriority.ToString());
         }
 
         if (oldType.HasValue && newType.HasValue && !oldType.Equals(newType))
         {
-            await db.HashDecrementAsync($"project:{projectId}:type-counts", oldType.ToString());
-            await db.HashIncrementAsync($"project:{projectId}:type-counts", newType.ToString());
+            _ = transaction.HashDecrementAsync($"project:{projectId}:type-counts", oldType.ToString());
+            _ = transaction.HashIncrementAsync($"project:{projectId}:type-counts", newType.ToString());
+        }
+
+        bool committed = await transaction.ExecuteAsync();
+
+        if (!committed)
+        {
+            throw new RedisException("--> Failed to commit transaction when consuming Issue Updated: " + context.Message.Id);
         }
 
         Console.WriteLine("--> Consumed Issue Updated: " + context.Message.Id);

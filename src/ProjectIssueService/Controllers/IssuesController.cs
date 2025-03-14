@@ -7,6 +7,8 @@ using ProjectIssueService.Entities;
 using ProjectIssueService.Data;
 using Microsoft.AspNetCore.Authorization;
 using Contracts;
+using ProjectIssueService.Helpers;
+using ProjectIssueService.Extensions;
 
 namespace ProjectIssueService.Controllers;
 
@@ -24,9 +26,11 @@ public class IssuesController(
     private readonly IMapper _mapper = mapper;
 
     [HttpGet]
-    public async Task<ActionResult<List<IssueDto>>> GetIssues()
+    public async Task<ActionResult<List<IssueDto>>> GetIssues([FromQuery] IssueParams parameters)
     {
-        return await _issueRepo.GetIssuesAsync();
+        var response = await _issueRepo.GetIssuesPaginatedAsync(parameters);
+        Response.AddPaginationHeader(response.TotalCount);
+        return response;
     }
 
     [HttpGet("{id}")]

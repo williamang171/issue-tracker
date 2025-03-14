@@ -4,6 +4,7 @@ using ProjectIssueService.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using ProjectIssueService.Helpers;
 
 namespace ProjectIssueService.Data;
 
@@ -33,6 +34,37 @@ public class ProjectRepository(ApplicationDbContext context, IMapper mapper) : I
         var query = context.Projects.AsQueryable();
 
         return await query.ProjectTo<ProjectDto>(mapper.ConfigurationProvider).ToListAsync();
+    }
+
+    public async Task<PagedList<ProjectDto>> GetProjectsPaginatedAsync(ProjectParams parameters)
+    {
+        var query = context.Projects.AsQueryable();
+
+        if (!string.IsNullOrEmpty(parameters.Name_Like))
+        {
+            query = query.Where(s => s.Name.Contains(parameters.Name_Like));
+        }
+
+        switch (parameters._sort)
+        {
+            case "name":
+                if (parameters._order.ToUpper().Equals("ASC"))
+                {
+                    query = query.OrderBy(s => s.Name);
+                }
+                else if (parameters._order.ToUpper().Equals("DESC"))
+                {
+                    query = query.OrderByDescending(s => s.Name);
+                }
+                break;
+            default:
+                break;
+        }
+
+        return await PagedList<ProjectDto>.CreateAsync
+            (query.ProjectTo<ProjectDto>(mapper.ConfigurationProvider).AsNoTracking(),
+            parameters.PageNumber,
+            parameters.PageSize);
     }
 
     public void RemoveProject(Project project)
