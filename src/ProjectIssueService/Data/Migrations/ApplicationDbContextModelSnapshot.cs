@@ -198,6 +198,13 @@ namespace ProjectIssueService.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -217,6 +224,12 @@ namespace ProjectIssueService.Data.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
@@ -230,12 +243,25 @@ namespace ProjectIssueService.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

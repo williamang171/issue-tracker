@@ -49,12 +49,16 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
 
         // await publishEndpoint.Publish(mapper.Map<ProjectCreated>(newProject));
 
-        var result = await repo.SaveChangesAsync();
+        if (await repo.SaveChangesAsync())
+        {
+            var projectDto = await repo.GetProjectByIdAsync(newProject.Id);
+            return CreatedAtAction(
+                nameof(GetProjectById),
+                new { id = newProject.Id },
+                projectDto);
+        }
 
-        if (!result) return BadRequest("Could not save changes to DB");
-
-        return CreatedAtAction(nameof(GetProjectById),
-            new { Id = project.Id }, newProject);
+        return BadRequest("Failed to create project");
     }
 
     [Authorize]
