@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ProjectIssueService.Entities;
 
 [Table("Projects")]
-public class Project
+public class Project : BaseEntity
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }

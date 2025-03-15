@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProjectIssueService.Data;
 
-public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
+public class ApplicationDbContext(DbContextOptions options, IHttpContextAccessor httpContextAccessor) : DbContext(options)
 {
     public DbSet<Project> Projects { get; set; }
     public DbSet<Issue> Issues { get; set; }
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -15,5 +16,43 @@ public class ApplicationDbContext(DbContextOptions options) : DbContext(options)
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
         modelBuilder.AddOutboxStateEntity();
+    }
+
+    public override int SaveChanges()
+    {
+        SetModifiedInformation();
+        return base.SaveChanges();
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        SetModifiedInformation();
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void SetModifiedInformation()
+    {
+        var currentUsername = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
+        Console.WriteLine(currentUsername);
+
+        var entries = ChangeTracker
+        .Entries()
+        .Where(e => e.Entity is BaseEntity && (
+            e.State == EntityState.Added ||
+            e.State == EntityState.Modified));
+
+        foreach (var entityEntry in entries)
+        {
+            if (entityEntry.State == EntityState.Added)
+            {
+                ((BaseEntity)entityEntry.Entity).CreatedBy = currentUsername;
+                ((BaseEntity)entityEntry.Entity).CreatedTime = DateTime.UtcNow;
+            }
+            if (entityEntry.State == EntityState.Modified)
+            {
+                ((BaseEntity)entityEntry.Entity).UpdatedBy = currentUsername;
+                ((BaseEntity)entityEntry.Entity).UpdatedTime = DateTime.UtcNow;
+            }
+        }
     }
 }

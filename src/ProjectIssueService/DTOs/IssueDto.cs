@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using ProjectIssueService.Entities;
 namespace ProjectIssueService.DTOs;
 
-public class IssueDto
+public class IssueDto : BaseDto
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }
