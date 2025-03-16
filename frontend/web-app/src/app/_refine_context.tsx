@@ -1,7 +1,7 @@
 
 "use client"
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNotificationProvider } from "@refinedev/antd";
 import { type AuthBindings, Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
@@ -35,10 +35,7 @@ const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>)
   const { data, status } = useSession();
   const to = usePathname();
 
-  if (status === 'loading') {
-    return <div>Loading...</div>
-  }
-
+  axiosInstance.interceptors.request.clear();
   axiosInstance.interceptors.request.use(
     async (config) => {
       const token = data?.accessToken;
@@ -51,6 +48,10 @@ const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>)
       return Promise.reject(error);
     }
   );
+
+  if (status === 'loading') {
+    return <div>Loading...</div>
+  }
 
   const authProvider: AuthBindings = {
     login: async ({ providerName, email, password }: any) => {

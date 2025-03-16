@@ -27,5 +27,10 @@ public class MappingProfiles : Profile
         CreateMap<IssueDto, IssueCreated>();
         CreateMap<IssueDto, IssueValues>();
         CreateMap<IssueDto, IssueDeleted>();
+
+        // Project Assignment mappings
+        CreateMap<ProjectAssignment, ProjectAssignmentDto>();
+        CreateMap<ProjectAssignmentDto, ProjectAssignment>();
+        CreateMap<ProjectAssignmentCreateDto, ProjectAssignment>();
     }
 }

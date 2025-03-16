@@ -47,6 +47,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IIssueRepository, IssueRepository>();
+builder.Services.AddScoped<IProjectAssignmentRepository, ProjectAssignmentRepository>();
 
 var app = builder.Build();
 

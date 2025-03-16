@@ -1,5 +1,4 @@
 'use server'
-
 import { auth } from '../api/auth/[...nextauth]/options'
 
 export async function getCurrentUser() {
