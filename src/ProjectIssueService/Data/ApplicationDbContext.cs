@@ -8,6 +8,8 @@ public class ApplicationDbContext(DbContextOptions options, IHttpContextAccessor
 {
     public DbSet<Project> Projects { get; set; }
     public DbSet<Issue> Issues { get; set; }
+    public DbSet<ProjectAssignment> ProjectAssignments { get; set; }
+    public DbSet<User> Users { get; set; }
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -16,6 +18,10 @@ public class ApplicationDbContext(DbContextOptions options, IHttpContextAccessor
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
         modelBuilder.AddOutboxStateEntity();
+
+        // Configure unique constraint for project assignment
+        modelBuilder.Entity<ProjectAssignment>()
+            .HasIndex(p => new { p.ProjectId, p.UserName }).IsUnique();
     }
 
     public override int SaveChanges()
@@ -33,7 +39,7 @@ public class ApplicationDbContext(DbContextOptions options, IHttpContextAccessor
     private void SetModifiedInformation()
     {
         var currentUsername = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-        Console.WriteLine(currentUsername);
+        // Console.WriteLine(currentUsername);
 
         var entries = ChangeTracker
         .Entries()

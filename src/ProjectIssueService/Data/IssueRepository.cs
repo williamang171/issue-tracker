@@ -5,7 +5,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using ProjectIssueService.Helpers;
-using Microsoft.IdentityModel.Tokens;
+
 namespace ProjectIssueService.Data;
 
 public class IssueRepository(ApplicationDbContext context, IMapper mapper) : IIssueRepository

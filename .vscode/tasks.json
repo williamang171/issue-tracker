@@ -1,0 +1,50 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "dotnet run GatewayService",
+			"command": "dotnet run --project ${workspaceFolder}\\src\\GatewayService --profile http",
+			"type": "shell",
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "dotnet run ProjectIssueService",
+			"command": "dotnet run --project ${workspaceFolder}\\src\\ProjectIssueService --profile http",
+			"type": "shell",
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "dotnet run IdentityService",
+			"command": "dotnet run --project ${workspaceFolder}\\src\\IdentityService --profile http",
+			"type": "shell",
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "dotnet run IssueStatsService",
+			"command": "dotnet run --project ${workspaceFolder}\\src\\IssueStatsService --profile http",
+			"type": "shell",
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "dotnet run UserService",
+			"command": "dotnet run --project ${workspaceFolder}\\src\\UserService --profile http",
+			"type": "shell",
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "dotnet run all services",
+			"dependsOn": [
+				"dotnet run GatewayService",
+				"dotnet run ProjectIssueService",
+				"dotnet run IdentityService",
+				"dotnet run IssueStatsService",
+				"dotnet run UserService"
+			],
+			"dependsOrder": "parallel",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}

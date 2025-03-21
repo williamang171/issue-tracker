@@ -6,13 +6,14 @@ import { ISSUE_STATUS_ARRAY } from "@app/constants/issue-status";
 import { ISSUE_TYPE_ARRAY } from "@app/constants/issue-type";
 import { mapToSelectItemObject } from "@app/utils/uitils-select";
 import { ISSUE_PRIORITY_ARRAY } from "@app/constants/issue-priority";
+import IssueFormItem from "./IssueFormItem";
 
-export default function ProjectCreate() {
-  const { formProps, saveButtonProps } = useForm({});
-
+export default function IssueCreate() {
+  const { formProps, saveButtonProps, form } = useForm<any, any, any>({});
   const { selectProps: projectSelectProps } = useSelect({
-    resource: "projects",
+    resource: "projects/all",
     optionLabel: "name",
+    optionValue: "id",
   });
 
   return (
@@ -101,6 +102,7 @@ export default function ProjectCreate() {
             style={{ width: 200 }}
           />
         </Form.Item>
+        <IssueFormItem form={form} />
       </Form>
     </Create>
   );

@@ -1,10 +1,24 @@
 import NextAuth, { Profile } from "next-auth"
 import { OIDCConfig } from 'next-auth/providers'
 import DuendeIDS6Provider from "next-auth/providers/duende-identity-server6"
+import axios from 'axios';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: 'jwt'
+  },
+  events: {
+    signIn: ({ account, profile }) => {
+      axios.post('http://localhost:6001/api/users/sync', {}, {
+        headers: {
+          Authorization: `Bearer ${account?.access_token}`
+        }
+      }).then(() => {
+        console.log(`sync executed successfully for ${profile?.username}`);
+      }).catch((err) => {
+        console.log(err);
+      })
+    }
   },
   providers: [
     DuendeIDS6Provider({
@@ -30,7 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async authorized({ auth }) {
       return !!auth
     },
-    async jwt({ token, profile, account }) {
+    async jwt({ token, profile, account, user }) {
       if (account && account.access_token) {
         token.accessToken = account.access_token
       }

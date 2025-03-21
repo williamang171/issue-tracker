@@ -3,6 +3,7 @@ export const RESOURCE = {
     comments: 'comments',
     issues: 'issues',
     projects: 'projects',
+    projectAssignments: 'projectAssignments',
     users: 'users',
     roles: 'roles',
     dashboardIssuesStatusCount: 'issueStats/status',

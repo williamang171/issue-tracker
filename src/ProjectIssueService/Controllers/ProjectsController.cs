@@ -27,6 +27,14 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
     }
 
     [Authorize]
+    [HttpGet("all")]
+    public async Task<ActionResult<List<ProjectForSelectDto>>> GetProjectAssignmentsAll()
+    {
+        var response = await repo.GetProjectsForSelectAsync();
+        return response;
+    }
+
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<ActionResult<ProjectDto>> GetProjectById(Guid id)
     {
