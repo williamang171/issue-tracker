@@ -14,4 +14,5 @@ public class Issue : BaseEntity
     public IssueType Type { get; set; }
     public Guid ProjectId { get; set; }
     public Project Project { get; set; } = null!;
+    public string? Assignee { get; set; }
 }

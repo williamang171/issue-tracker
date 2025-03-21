@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UserService.Data;
@@ -11,9 +12,11 @@ using UserService.Data;
 namespace UserService.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250320144141_MassTransit")]
+    partial class MassTransit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,7 +197,7 @@ namespace UserService.Data.Migrations
 
             modelBuilder.Entity("UserService.Entities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
@@ -218,7 +221,7 @@ namespace UserService.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("Guid");
 
                     b.HasIndex("UserName")
                         .IsUnique();

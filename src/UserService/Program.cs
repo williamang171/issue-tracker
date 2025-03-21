@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using UserService.Data;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,28 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddMassTransit(x =>
+{
+    x.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
+    {
+        o.QueryDelay = TimeSpan.FromSeconds(10);
+        o.UsePostgres();
+        o.UseBusOutbox();
+    });
 
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("user", false));
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
+        {
+            h.Username(builder.Configuration.GetValue("RabbitMQ:Username", "guest")!);
+            h.Password(builder.Configuration.GetValue("RabbitMQ:Password", "guest")!);
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

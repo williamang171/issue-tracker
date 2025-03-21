@@ -1,8 +1,8 @@
 using System;
 
-namespace UserService.DTOs;
+namespace Contracts;
 
-public class UserDto
+public class UserCreated
 {
     public Guid Id { get; set; }
     public required string UserName { get; set; }

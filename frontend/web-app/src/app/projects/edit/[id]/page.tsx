@@ -1,6 +1,7 @@
 "use client";
 
 import { DashboardCharts } from "@components/dashboard";
+import { UsersList } from "@components/project-assignments/List";
 import { useGetProjectChartsData } from "@hooks/useGetProjectChartsData";
 import { Edit, useForm, } from "@refinedev/antd";
 import { Form, Input } from "antd";
@@ -38,6 +39,9 @@ export default function ProjectEdit() {
 
         </Form>
       </Edit>
+      <div style={{ marginBottom: "24px" }} />
+      {queryResult?.data?.data.id ? <UsersList projectId={queryResult?.data?.data.id} /> : null}
+
       <div style={{ marginBottom: "24px" }} />
       <DashboardCharts
         issuePriorityCountData={issuePriorityCountData}

@@ -4,13 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 using UserService.Data;
 using UserService.DTOs;
 using UserService.Entities;
+using MassTransit;
+using Contracts;
 
 namespace UserService.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController(IUserRepository repo, IMapper mapper, IHttpContextAccessor httpContextAccessor) : ControllerBase
+    public class UsersController(IUserRepository repo,
+    IMapper mapper,
+    IHttpContextAccessor httpContextAccessor,
+    IPublishEndpoint publishEndpoint) : ControllerBase
     {
         private readonly IUserRepository _userRepo = repo;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
@@ -24,8 +29,8 @@ namespace UserService.Controllers
         }
 
         [HttpPost]
-        [Route("sync-last-login")]
-        public async Task<ActionResult> SyncLastLogin()
+        [Route("sync")]
+        public async Task<ActionResult> Sync()
         {
             var currentUsername = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
             if (currentUsername == null)
@@ -36,7 +41,17 @@ namespace UserService.Controllers
 
             if (user != null)
             {
+                var oldUserDto = _mapper.Map<UserDto>(user);
                 user.LastLoginTime = DateTime.UtcNow;
+                var newUserDto = _mapper.Map<UserDto>(user);
+                UserUpdated userUpdated = new()
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    OldValues = _mapper.Map<UserValues>(oldUserDto),
+                    NewValues = _mapper.Map<UserValues>(newUserDto),
+                };
+                await publishEndpoint.Publish(userUpdated);
             }
             else
             {
@@ -47,12 +62,14 @@ namespace UserService.Controllers
                 var newUser = _mapper.Map<User>(newUserDto);
                 newUser.LastLoginTime = DateTime.UtcNow;
                 _userRepo.AddUser(newUser);
+                var toPublish = _mapper.Map<UserDto>(newUser);
+                await publishEndpoint.Publish(_mapper.Map<UserCreated>(toPublish));
             }
             if (await _userRepo.SaveChangesAsync())
             {
                 return Ok();
             }
-            return BadRequest("Failed to update user:sync-last-login");
+            return BadRequest("Failed to update user:sync");
         }
     }
 }

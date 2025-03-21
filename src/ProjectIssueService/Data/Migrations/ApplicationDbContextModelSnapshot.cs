@@ -198,6 +198,9 @@ namespace ProjectIssueService.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Assignee")
+                        .HasColumnType("text");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("text");
@@ -300,6 +303,24 @@ namespace ProjectIssueService.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("ProjectAssignments");
+                });
+
+            modelBuilder.Entity("ProjectIssueService.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("ProjectIssueService.Entities.Issue", b =>

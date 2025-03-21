@@ -32,8 +32,13 @@ public class ProjectRepository(ApplicationDbContext context, IMapper mapper) : I
     public async Task<List<ProjectDto>> GetProjectsAsync()
     {
         var query = context.Projects.AsQueryable();
-
         return await query.ProjectTo<ProjectDto>(mapper.ConfigurationProvider).ToListAsync();
+    }
+
+    public async Task<List<ProjectForSelectDto>> GetProjectsForSelectAsync()
+    {
+        var query = context.Projects.AsQueryable();
+        return await query.ProjectTo<ProjectForSelectDto>(mapper.ConfigurationProvider).ToListAsync();
     }
 
     public async Task<PagedList<ProjectDto>> GetProjectsPaginatedAsync(ProjectParams parameters)

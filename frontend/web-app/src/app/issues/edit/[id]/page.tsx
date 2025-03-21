@@ -6,12 +6,14 @@ import { ISSUE_TYPE_ARRAY } from "@app/constants/issue-type";
 import { mapToSelectItemObject } from "@app/utils/uitils-select";
 import { Edit, useForm, useSelect, } from "@refinedev/antd";
 import { Form, Input, Select } from "antd";
+import IssueFormItem from "./IssueFormItem";
 
 export default function IssueEdit() {
   const { formProps, saveButtonProps, query: queryResult } = useForm({});
+  console.log(queryResult);
 
   const { selectProps: projectSelectProps } = useSelect({
-    resource: "projects",
+    resource: "projects/all",
     optionLabel: "name",
   });
 
@@ -101,6 +103,7 @@ export default function IssueEdit() {
             style={{ width: 200 }}
           />
         </Form.Item>
+        <IssueFormItem projectId={queryResult?.data?.data.projectId} />
       </Form>
     </Edit>
   );

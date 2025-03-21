@@ -18,6 +18,7 @@ namespace ProjectIssueService.Controllers;
 public class IssuesController(
     IIssueRepository issueRepo,
     IProjectRepository projectRepo,
+    IUserRepository userRepo,
     IMapper mapper,
     IPublishEndpoint publishEndpoint) : ControllerBase
 {
@@ -49,6 +50,15 @@ public class IssuesController(
         var project = await _projectRepo.GetProjectEntityById(createIssueDto.ProjectId);
         if (project == null) return BadRequest("Invalid ProjectId");
 
+        var assignee = createIssueDto.Assignee;
+        if (assignee != null)
+        {
+            if (await userRepo.GetUserEntityByUserName(assignee) == null)
+            {
+                return BadRequest("Invalid assignee");
+            }
+        }
+
         var issue = _mapper.Map<Issue>(createIssueDto);
 
         _issueRepo.AddIssue(issue);
@@ -76,6 +86,15 @@ public class IssuesController(
 
         if (issue == null) return NotFound();
 
+        var assignee = dto.Assignee;
+        if (assignee != null)
+        {
+            if (await userRepo.GetUserEntityByUserName(assignee) == null)
+            {
+                return BadRequest("Invalid assignee");
+            }
+        }
+
         var oldIssue = _mapper.Map<IssueDto>(issue);
 
         issue.Name = dto.Name ?? issue.Name;
@@ -83,6 +102,7 @@ public class IssuesController(
         issue.Status = dto.Status ?? issue.Status;
         issue.Priority = dto.Priority ?? issue.Priority;
         issue.Type = dto.Type ?? issue.Type;
+        issue.Assignee = dto.Assignee ?? issue.Assignee;
 
         var newIssue = _mapper.Map<IssueDto>(issue);
 

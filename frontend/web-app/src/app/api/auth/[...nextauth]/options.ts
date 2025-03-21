@@ -9,12 +9,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   events: {
     signIn: ({ account, profile }) => {
-      axios.post('http://localhost:6001/api/users/sync-last-login', {}, {
+      axios.post('http://localhost:6001/api/users/sync', {}, {
         headers: {
           Authorization: `Bearer ${account?.access_token}`
         }
       }).then(() => {
-        console.log(`sync-last-login executed successfully for ${profile?.username}`);
+        console.log(`sync executed successfully for ${profile?.username}`);
       }).catch((err) => {
         console.log(err);
       })

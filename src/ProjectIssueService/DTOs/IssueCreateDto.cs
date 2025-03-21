@@ -13,4 +13,5 @@ public class IssueCreateDto
     public IssueType Type { get; set; }
     [Required]
     public Guid ProjectId { get; set; }
+    public string? Assignee { get; set; }
 }

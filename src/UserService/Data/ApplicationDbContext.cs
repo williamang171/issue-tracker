@@ -12,6 +12,9 @@ public class ApplicationDbContext(DbContextOptions options, IHttpContextAccessor
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
     }
 
     public override int SaveChanges()
@@ -29,8 +32,6 @@ public class ApplicationDbContext(DbContextOptions options, IHttpContextAccessor
     private void SetModifiedInformation()
     {
         var currentUsername = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
-        Console.WriteLine(currentUsername);
-
         var entries = ChangeTracker
         .Entries()
         .Where(e => e.Entity is BaseEntity && (

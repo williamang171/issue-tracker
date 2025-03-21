@@ -37,19 +37,46 @@ public class ProjectAssignmentRepository(ApplicationDbContext context, IMapper m
            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<List<ProjectAssignmentDto>> GetProjectAssignmentsAsync()
+    public async Task<List<ProjectAssignmentDto>> GetProjectAssignmentsAsync(ProjectAssignmentParams parameters)
     {
         var query = _context.ProjectAssignments.AsQueryable();
+
+        if (parameters.ProjectId.HasValue)
+        {
+            query = query.Where(s => s.ProjectId.Equals(parameters.ProjectId.Value));
+        }
+        if (!string.IsNullOrEmpty(parameters.UserName_Like))
+        {
+            query = query.Where(s => s.UserName.Contains(parameters.UserName_Like));
+        }
+
         return await query.ProjectTo<ProjectAssignmentDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
-    public async Task<PagedList<ProjectAssignmentDto>> GetProjectAssignmentsPaginatedAsync(PaginationParams parameters)
+    public async Task<PagedList<ProjectAssignmentDto>> GetProjectAssignmentsPaginatedAsync(ProjectAssignmentParams parameters)
     {
         var query = _context.ProjectAssignments.AsQueryable();
+
+        if (parameters.ProjectId.HasValue)
+        {
+            query = query.Where(s => s.ProjectId.Equals(parameters.ProjectId.Value));
+        }
+        if (!string.IsNullOrEmpty(parameters.UserName_Like))
+        {
+            query = query.Where(s => s.UserName.Contains(parameters.UserName_Like));
+        }
+
         return await PagedList<ProjectAssignmentDto>.CreateAsync
             (query.ProjectTo<ProjectAssignmentDto>(_mapper.ConfigurationProvider).AsNoTracking(),
             parameters.PageNumber,
             parameters.PageSize);
+    }
+
+    public async Task<IEnumerable<ProjectAssignment>> GetProjectAssignmentsByProjectIdAsync(Guid projectId)
+    {
+        return await _context.ProjectAssignments
+            .Where(pa => pa.ProjectId == projectId)
+            .ToListAsync();
     }
 
     public void RemoveProjectAssignment(ProjectAssignment projectAssignment)

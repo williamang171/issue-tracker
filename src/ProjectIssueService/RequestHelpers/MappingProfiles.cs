@@ -16,6 +16,7 @@ public class MappingProfiles : Profile
         CreateMap<ProjectUpdateDto, Project>();
         CreateMap<Project, ProjectUpdateDto>();
         CreateMap<ProjectDto, ProjectDeleted>();
+        CreateMap<Project, ProjectForSelectDto>();
 
         // Issue mappings
         CreateMap<Issue, IssueDto>();
@@ -32,5 +33,11 @@ public class MappingProfiles : Profile
         CreateMap<ProjectAssignment, ProjectAssignmentDto>();
         CreateMap<ProjectAssignmentDto, ProjectAssignment>();
         CreateMap<ProjectAssignmentCreateDto, ProjectAssignment>();
+        CreateMap<ProjectAssignment, BulkProjectAssignmentDto>();
+
+        // User mappings
+        CreateMap<User, UserDto>();
+        CreateMap<UserDto, User>();
+        CreateMap<UserDto, UserCreated>();
     }
 }

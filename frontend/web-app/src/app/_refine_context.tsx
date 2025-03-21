@@ -21,7 +21,7 @@ export const RefineContext = (
   props: React.PropsWithChildren<RefineContextProps>,
 ) => {
   return (
-    <SessionProvider refetchOnWindowFocus={false}>
+    <SessionProvider>
       <App {...props} />
     </SessionProvider>
   );

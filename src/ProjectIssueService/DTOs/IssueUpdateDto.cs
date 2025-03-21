@@ -11,4 +11,5 @@ public class IssueUpdateDto
     public IssueStatus? Status { get; set; }
     public IssuePriority? Priority { get; set; }
     public IssueType? Type { get; set; }
+    public string? Assignee { get; set; }
 }
