@@ -10,6 +10,7 @@ public class ApplicationDbContext(DbContextOptions options, IHttpContextAccessor
     public DbSet<Issue> Issues { get; set; }
     public DbSet<ProjectAssignment> ProjectAssignments { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Comment> Comments { get; set; }
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
