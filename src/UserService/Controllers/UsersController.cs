@@ -13,11 +13,13 @@ namespace UserService.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController(IUserRepository repo,
+    IRoleRepository roleRepo,
     IMapper mapper,
     IHttpContextAccessor httpContextAccessor,
     IPublishEndpoint publishEndpoint) : ControllerBase
     {
         private readonly IUserRepository _userRepo = repo;
+        private readonly IRoleRepository _roleRepo = roleRepo;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IMapper _mapper = mapper;
 
@@ -26,6 +28,42 @@ namespace UserService.Controllers
         {
             var response = await _userRepo.GetUsersAsync();
             return response;
+        }
+
+        [HttpGet("{username}")]
+        public async Task<ActionResult<UserDto>> GetUserByUserName(string username)
+        {
+            var response = await _userRepo.GetUserByUserNameAsync(username);
+            if (response == null)
+            {
+                return NotFound();
+            }
+            return response;
+        }
+
+        [HttpPatch("{username}")]
+        public async Task<ActionResult> UpdateUser(string username, UserUpdateDto dto)
+        {
+            var user = await _userRepo.GetUserEntityByUserName(username);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var roleId = dto.RoleId;
+            if (roleId.HasValue)
+            {
+                var role = await _roleRepo.GetRoleEntityById(roleId.Value);
+                if (role == null)
+                {
+                    return BadRequest("Role not found");
+                }
+            }
+
+            user.RoleId = dto.RoleId ?? user.RoleId;
+
+            await _userRepo.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpPost]

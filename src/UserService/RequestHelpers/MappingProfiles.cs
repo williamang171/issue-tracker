@@ -14,5 +14,9 @@ public class MappingProfiles : Profile
         CreateMap<UserSyncLastLoginDto, User>();
         CreateMap<UserDto, UserCreated>();
         CreateMap<UserDto, UserValues>();
+
+        // Role mappings
+        CreateMap<Role, RoleDto>();
+        CreateMap<RoleDto, RoleDto>();
     }
 }

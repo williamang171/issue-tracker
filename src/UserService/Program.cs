@@ -45,6 +45,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters.NameClaimType = "username";
     });
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 var app = builder.Build();
 
@@ -55,7 +56,7 @@ app.MapControllers();
 
 try
 {
-    DbInitializer.InitDb(app);
+    await DbInitializer.InitDb(app);
 }
 catch (Exception e)
 {
