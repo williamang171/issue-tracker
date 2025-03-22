@@ -5,6 +5,7 @@ using ProjectIssueService.DTOs;
 using ProjectIssueService.Entities;
 using ProjectIssueService.Data;
 using Microsoft.AspNetCore.Authorization;
+using ProjectIssueService.Helpers;
 
 namespace ProjectIssueService.Controllers;
 
@@ -21,9 +22,9 @@ public class CommentsController(
     private readonly IMapper _mapper = mapper;
 
     [HttpGet]
-    public async Task<ActionResult<List<CommentDto>>> GetComments()
+    public async Task<ActionResult<List<CommentDto>>> GetComments([FromQuery] CommentParams parameters)
     {
-        var response = await _commentRepo.GetCommentsAsync();
+        var response = await _commentRepo.GetCommentsAsync(parameters);
         return response;
     }
 

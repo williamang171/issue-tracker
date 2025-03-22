@@ -3,31 +3,46 @@
 	"tasks": [
 		{
 			"label": "dotnet run GatewayService",
-			"command": "dotnet run --project ${workspaceFolder}\\src\\GatewayService --profile http",
+			"command": "dotnet run --project ${workspaceFolder}/src/GatewayService --profile http",
+			"windows": {
+				"command": "dotnet run --project ${workspaceFolder}\\src\\GatewayService --profile http",
+			},
 			"type": "shell",
 			"problemMatcher": "$msCompile"
 		},
 		{
 			"label": "dotnet run ProjectIssueService",
-			"command": "dotnet run --project ${workspaceFolder}\\src\\ProjectIssueService --profile http",
+			"windows": {
+				"command": "dotnet run --project ${workspaceFolder}\\src\\ProjectIssueService --profile http",
+			},
+			"command": "dotnet run --project ${workspaceFolder}/src/ProjectIssueService --profile http",
 			"type": "shell",
 			"problemMatcher": "$msCompile"
 		},
 		{
 			"label": "dotnet run IdentityService",
-			"command": "dotnet run --project ${workspaceFolder}\\src\\IdentityService --profile http",
+			"windows": {
+				"command": "dotnet run --project ${workspaceFolder}\\src\\IdentityService --profile http",
+			},
+			"command": "dotnet run --project ${workspaceFolder}/src/IdentityService --profile http",
 			"type": "shell",
 			"problemMatcher": "$msCompile"
 		},
 		{
 			"label": "dotnet run IssueStatsService",
-			"command": "dotnet run --project ${workspaceFolder}\\src\\IssueStatsService --profile http",
+			"windows": {
+				"command": "dotnet run --project ${workspaceFolder}\\src\\IssueStatsService --profile http",
+			},
+			"command": "dotnet run --project ${workspaceFolder}/src/IssueStatsService --profile http",
 			"type": "shell",
 			"problemMatcher": "$msCompile"
 		},
 		{
 			"label": "dotnet run UserService",
-			"command": "dotnet run --project ${workspaceFolder}\\src\\UserService --profile http",
+			"windows": {
+				"command": "dotnet run --project ${workspaceFolder}\\src\\UserService --profile http",
+			},
+			"command": "dotnet run --project ${workspaceFolder}/src/UserService --profile http",
 			"type": "shell",
 			"problemMatcher": "$msCompile"
 		},

@@ -1,27 +1,26 @@
+'use client';
 
-"use client"
-
-import React, { useEffect, useMemo, useState } from "react";
-import { useNotificationProvider } from "@refinedev/antd";
-import { type AuthBindings, Refine } from "@refinedev/core";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import routerProvider from "@refinedev/nextjs-router";
-import { SessionProvider, signIn, signOut, useSession } from "next-auth/react";
-import { ColorModeContextProvider } from "@contexts/color-mode";
-import { dataProvider } from "@providers/data-provider/data-provider.client";
-import "@refinedev/antd/dist/reset.css";
-import { axiosInstance } from "./utils/axios-instance";
-import { usePathname } from "next/navigation";
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNotificationProvider } from '@refinedev/antd';
+import { type AuthBindings, Refine } from '@refinedev/core';
+import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar';
+import routerProvider from '@refinedev/nextjs-router';
+import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
+import { ColorModeContextProvider } from '@contexts/color-mode';
+import { dataProvider } from '@providers/data-provider/data-provider.client';
+import '@refinedev/antd/dist/reset.css';
+import { axiosInstance } from './utils/axios-instance';
+import { usePathname } from 'next/navigation';
 
 type RefineContextProps = {
   defaultMode?: string;
 };
 
 export const RefineContext = (
-  props: React.PropsWithChildren<RefineContextProps>,
+  props: React.PropsWithChildren<RefineContextProps>
 ) => {
   return (
-    <SessionProvider>
+    <SessionProvider refetchOnWindowFocus={false}>
       <App {...props} />
     </SessionProvider>
   );
@@ -31,7 +30,10 @@ type AppProps = {
   defaultMode?: string;
 };
 
-const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
+const App = async ({
+  children,
+  defaultMode,
+}: React.PropsWithChildren<AppProps>) => {
   const { data, status } = useSession();
   const to = usePathname();
 
@@ -50,14 +52,14 @@ const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>)
   );
 
   if (status === 'loading') {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   const authProvider: AuthBindings = {
     login: async ({ providerName, email, password }: any) => {
       if (providerName) {
         signIn(providerName, {
-          callbackUrl: to ? to.toString() : "/",
+          callbackUrl: to ? to.toString() : '/',
           redirect: true,
         });
 
@@ -66,10 +68,10 @@ const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>)
         };
       }
 
-      const signUpResponse = await signIn("CredentialsSignUp", {
+      const signUpResponse = await signIn('CredentialsSignUp', {
         email,
         password,
-        callbackUrl: to ? to.toString() : "/",
+        callbackUrl: to ? to.toString() : '/',
         redirect: false,
       });
 
@@ -84,7 +86,7 @@ const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>)
       if (ok) {
         return {
           success: true,
-          redirectTo: "/",
+          redirectTo: '/',
         };
       }
 
@@ -96,7 +98,7 @@ const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>)
     logout: async () => {
       signOut({
         redirect: true,
-        callbackUrl: "/login",
+        callbackUrl: '/login',
       });
 
       return {
@@ -118,7 +120,6 @@ const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>)
       if (status === 'unauthenticated') {
         return {
           authenticated: false,
-          redirectTo: "/login",
         };
       }
 
@@ -133,6 +134,7 @@ const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>)
       if (data?.user) {
         const { user } = data;
         return {
+          username: user.username,
           name: user.name,
           avatar: user.image,
         };
@@ -165,25 +167,25 @@ const App = async ({ children, defaultMode }: React.PropsWithChildren<AppProps>)
               //   },
               // },
               {
-                name: "projects",
-                list: "/projects",
-                create: "/projects/create",
-                edit: "/projects/edit/:id",
-                show: "/projects/show/:id",
+                name: 'projects',
+                list: '/projects',
+                create: '/projects/create',
+                edit: '/projects/edit/:id',
+                show: '/projects/show/:id',
                 meta: {
                   canDelete: true,
                 },
               },
               {
-                name: "issues",
-                list: "/issues",
-                create: "/issues/create",
-                edit: "/issues/edit/:id",
-                show: "/issues/show/:id",
+                name: 'issues',
+                list: '/issues',
+                create: '/issues/create',
+                edit: '/issues/edit/:id',
+                show: '/issues/show/:id',
                 meta: {
                   canDelete: true,
                 },
-              }
+              },
             ]}
             options={{
               syncWithLocation: true,
