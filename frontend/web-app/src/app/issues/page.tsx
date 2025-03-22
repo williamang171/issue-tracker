@@ -1,10 +1,13 @@
-"use client";
+'use client';
 
-import { ISSUE_PRIORITY, ISSUE_PRIORITY_ARRAY } from "@app/constants/issue-priority";
-import { ISSUE_STATUS, ISSUE_STATUS_ARRAY } from "@app/constants/issue-status";
-import { ISSUE_TYPE, ISSUE_TYPE_ARRAY } from "@app/constants/issue-type";
+import {
+  ISSUE_PRIORITY,
+  ISSUE_PRIORITY_ARRAY,
+} from '@app/constants/issue-priority';
+import { ISSUE_STATUS, ISSUE_STATUS_ARRAY } from '@app/constants/issue-status';
+import { ISSUE_TYPE, ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
 import { SearchOutlined } from '@ant-design/icons';
-import { renderEnumFieldLabel } from "@app/utils/utils-table-col-render";
+import { renderEnumFieldLabel } from '@app/utils/utils-table-col-render';
 import {
   DeleteButton,
   EditButton,
@@ -13,10 +16,11 @@ import {
   ShowButton,
   useSelect,
   useTable,
-} from "@refinedev/antd";
-import { getDefaultFilter, type BaseRecord } from "@refinedev/core";
-import { Input, Space, Table, theme } from "antd";
-import { RESOURCE } from "@app/constants/resource";
+} from '@refinedev/antd';
+import { getDefaultFilter, type BaseRecord } from '@refinedev/core';
+import { Input, InputRef, Space, Table, theme } from 'antd';
+import { RESOURCE } from '@app/constants/resource';
+import { useRef } from 'react';
 
 export default function IssueList() {
   const { tableProps, filters } = useTable({
@@ -27,13 +31,13 @@ export default function IssueList() {
           field: 'name',
           operator: 'contains',
           value: '',
-        }
-      ]
-    }
+        },
+      ],
+    },
   });
 
   const { query: projectQueryResult } = useSelect({
-    resource: "projects",
+    resource: 'projects',
     optionLabel: 'name',
     optionValue: 'id',
   });
@@ -43,12 +47,15 @@ export default function IssueList() {
     optionLabel: 'name',
     optionValue: 'id',
   });
+  const searchInput = useRef<InputRef>(null);
   const projects = queryResult?.data?.data || [];
 
   return (
     <List>
       <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="name" title={"Name"}
+        <Table.Column
+          dataIndex="name"
+          title={'Name'}
           filterIcon={(filtered) => (
             <SearchOutlined
               style={{
@@ -59,12 +66,17 @@ export default function IssueList() {
           sorter
           defaultFilteredValue={getDefaultFilter('name', filters, 'contains')}
           filterDropdown={(props) => (
-            <FilterDropdown
-              {...props}
-            >
-              <Input placeholder={''} />
+            <FilterDropdown {...props}>
+              <Input placeholder={''} ref={searchInput} />
             </FilterDropdown>
           )}
+          filterDropdownProps={{
+            onOpenChange: (open) => {
+              if (open) {
+                setTimeout(() => searchInput.current?.select(), 100);
+              }
+            },
+          }}
         />
         <Table.Column
           dataIndex="projectId"
@@ -75,11 +87,7 @@ export default function IssueList() {
             );
             return found?.name;
           }}
-          defaultFilteredValue={getDefaultFilter(
-            'projectId',
-            filters,
-            'eq'
-          )}
+          defaultFilteredValue={getDefaultFilter('projectId', filters, 'eq')}
           filterMultiple={false}
           filters={projects.map((item) => {
             return {
@@ -88,7 +96,9 @@ export default function IssueList() {
             };
           })}
         />
-        <Table.Column dataIndex="status" title={"Status"}
+        <Table.Column
+          dataIndex="status"
+          title={'Status'}
           render={(value, record) => {
             return renderEnumFieldLabel(value, record, 'status', ISSUE_STATUS);
           }}
@@ -101,9 +111,16 @@ export default function IssueList() {
           })}
           filterMultiple={false}
         />
-        <Table.Column dataIndex="priority" title={"Priority"}
+        <Table.Column
+          dataIndex="priority"
+          title={'Priority'}
           render={(value, record) => {
-            return renderEnumFieldLabel(value, record, 'priority', ISSUE_PRIORITY);
+            return renderEnumFieldLabel(
+              value,
+              record,
+              'priority',
+              ISSUE_PRIORITY
+            );
           }}
           defaultFilteredValue={getDefaultFilter('priority', filters, 'eq')}
           filters={ISSUE_PRIORITY_ARRAY.map((item) => {
@@ -114,7 +131,9 @@ export default function IssueList() {
           })}
           filterMultiple={false}
         />
-        <Table.Column dataIndex="type" title={"Type"}
+        <Table.Column
+          dataIndex="type"
+          title={'Type'}
           render={(value, record) => {
             return renderEnumFieldLabel(value, record, 'type', ISSUE_TYPE);
           }}
@@ -126,16 +145,27 @@ export default function IssueList() {
               value: item.id,
             };
           })}
+          filterDropdownProps={{
+            onOpenChange: (open) => {
+              if (open) {
+                setTimeout(() => searchInput.current?.select(), 100);
+              }
+            },
+          }}
         />
-        <Table.Column dataIndex="projectId" title={"Project"} render={(value, record) => {
-          const projects = projectQueryResult?.data?.data || [];
-          const found = projects.find(
-            (item) => item?.id === record.projectId
-          );
-          return found?.name;
-        }} />
         <Table.Column
-          title={"Actions"}
+          dataIndex="projectId"
+          title={'Project'}
+          render={(value, record) => {
+            const projects = projectQueryResult?.data?.data || [];
+            const found = projects.find(
+              (item) => item?.id === record.projectId
+            );
+            return found?.name;
+          }}
+        />
+        <Table.Column
+          title={'Actions'}
           dataIndex="actions"
           render={(_, record: BaseRecord) => (
             <Space>

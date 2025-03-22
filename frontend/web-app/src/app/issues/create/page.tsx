@@ -1,27 +1,30 @@
-"use client";
+'use client';
 
-import { Create, useForm, useSelect } from "@refinedev/antd";
-import { Form, Input, InputNumber, Select } from "antd";
-import { ISSUE_STATUS_ARRAY } from "@app/constants/issue-status";
-import { ISSUE_TYPE_ARRAY } from "@app/constants/issue-type";
-import { mapToSelectItemObject } from "@app/utils/uitils-select";
-import { ISSUE_PRIORITY_ARRAY } from "@app/constants/issue-priority";
-import IssueFormItem from "./IssueFormItem";
+import { Create, useForm, useSelect } from '@refinedev/antd';
+import { Form, Input, InputNumber, Select } from 'antd';
+import { ISSUE_STATUS_ARRAY } from '@app/constants/issue-status';
+import { ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
+import { mapToSelectItemObject } from '@app/utils/uitils-select';
+import { ISSUE_PRIORITY_ARRAY } from '@app/constants/issue-priority';
+import IssueFormItem from './IssueFormItem';
+// import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/router';
+import { useRouter } from 'next/compat/router';
 
 export default function IssueCreate() {
   const { formProps, saveButtonProps, form } = useForm<any, any, any>({});
   const { selectProps: projectSelectProps } = useSelect({
-    resource: "projects/all",
-    optionLabel: "name",
-    optionValue: "id",
+    resource: 'projects/all',
+    optionLabel: 'name',
+    optionValue: 'id',
   });
 
   return (
     <Create saveButtonProps={saveButtonProps}>
       <Form {...formProps} layout="vertical">
         <Form.Item
-          label={"Project"}
-          name={"projectId"}
+          label={'Project'}
+          name={'projectId'}
           rules={[
             {
               required: true,
@@ -31,8 +34,8 @@ export default function IssueCreate() {
           <Select {...projectSelectProps} />
         </Form.Item>
         <Form.Item
-          label={"Name"}
-          name={["name"]}
+          label={'Name'}
+          name={['name']}
           rules={[
             {
               required: true,
@@ -42,7 +45,7 @@ export default function IssueCreate() {
           <Input />
         </Form.Item>
         <Form.Item
-          label={"Description"}
+          label={'Description'}
           name="description"
           rules={[
             {
@@ -53,8 +56,8 @@ export default function IssueCreate() {
           <Input.TextArea rows={5} />
         </Form.Item>
         <Form.Item
-          label={"Status"}
-          name={["status"]}
+          label={'Status'}
+          name={['status']}
           initialValue={0}
           rules={[
             {
@@ -64,15 +67,13 @@ export default function IssueCreate() {
         >
           <Select
             defaultValue={0}
-            options={
-              ISSUE_STATUS_ARRAY.map(mapToSelectItemObject)
-            }
+            options={ISSUE_STATUS_ARRAY.map(mapToSelectItemObject)}
             style={{ width: 200 }}
           />
         </Form.Item>
         <Form.Item
-          label={"Priority"}
-          name={["priority"]}
+          label={'Priority'}
+          name={['priority']}
           rules={[
             {
               required: true,
@@ -80,15 +81,13 @@ export default function IssueCreate() {
           ]}
         >
           <Select
-            options={
-              ISSUE_PRIORITY_ARRAY.map(mapToSelectItemObject)
-            }
+            options={ISSUE_PRIORITY_ARRAY.map(mapToSelectItemObject)}
             style={{ width: 200 }}
           />
         </Form.Item>
         <Form.Item
-          label={"Type"}
-          name={["type"]}
+          label={'Type'}
+          name={['type']}
           rules={[
             {
               required: true,
@@ -96,9 +95,7 @@ export default function IssueCreate() {
           ]}
         >
           <Select
-            options={
-              ISSUE_TYPE_ARRAY.map(mapToSelectItemObject)
-            }
+            options={ISSUE_TYPE_ARRAY.map(mapToSelectItemObject)}
             style={{ width: 200 }}
           />
         </Form.Item>

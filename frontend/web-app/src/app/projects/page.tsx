@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   DeleteButton,
@@ -7,12 +7,14 @@ import {
   List,
   ShowButton,
   useTable,
-} from "@refinedev/antd";
-import { getDefaultFilter, type BaseRecord } from "@refinedev/core";
+} from '@refinedev/antd';
+import { getDefaultFilter, type BaseRecord } from '@refinedev/core';
 import { SearchOutlined } from '@ant-design/icons';
-import { Input, Space, Table, theme } from "antd";
+import { Input, InputRef, Space, Table, theme } from 'antd';
+import { useRef } from 'react';
 
 export default function ProjectList() {
+  const searchInput = useRef<InputRef>(null);
   const { tableProps, filters } = useTable({
     syncWithLocation: true,
     filters: {
@@ -21,34 +23,43 @@ export default function ProjectList() {
           field: 'name',
           operator: 'contains',
           value: '',
-        }
-      ]
-    }
+        },
+      ],
+    },
   });
   const { token } = theme.useToken();
 
   return (
     <List>
       <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="name" title={"Name"} sorter filterIcon={(filtered) => (
-          <SearchOutlined
-            style={{
-              color: filtered ? token.colorPrimary : undefined,
-            }}
-          />
-        )}
-
+        <Table.Column
+          dataIndex="name"
+          title={'Name'}
+          sorter
+          filterIcon={(filtered) => (
+            <SearchOutlined
+              style={{
+                color: filtered ? token.colorPrimary : undefined,
+              }}
+            />
+          )}
           defaultFilteredValue={getDefaultFilter('name', filters, 'contains')}
           filterDropdown={(props) => (
-            <FilterDropdown
-              {...props}
-            >
-              <Input placeholder={''} />
+            <FilterDropdown {...props}>
+              <Input placeholder={''} ref={searchInput} />
             </FilterDropdown>
-          )} />
-        <Table.Column dataIndex="description" title={"Description"} />
+          )}
+          filterDropdownProps={{
+            onOpenChange: (open) => {
+              if (open) {
+                setTimeout(() => searchInput.current?.select(), 100);
+              }
+            },
+          }}
+        />
+        <Table.Column dataIndex="description" title={'Description'} />
         <Table.Column
-          title={"Actions"}
+          title={'Actions'}
           dataIndex="actions"
           render={(_, record: BaseRecord) => (
             <Space>

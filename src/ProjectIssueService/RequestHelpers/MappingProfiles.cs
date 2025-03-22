@@ -39,5 +39,10 @@ public class MappingProfiles : Profile
         CreateMap<User, UserDto>();
         CreateMap<UserDto, User>();
         CreateMap<UserDto, UserCreated>();
+
+        // Comment mappings
+        CreateMap<Comment, CommentDto>();
+        CreateMap<CommentDto, Comment>();
+        CreateMap<CommentCreateDto, Comment>();
     }
 }
