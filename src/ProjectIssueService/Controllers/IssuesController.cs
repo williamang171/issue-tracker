@@ -13,7 +13,6 @@ using ProjectIssueService.Extensions;
 namespace ProjectIssueService.Controllers;
 
 [ApiController]
-[Authorize]
 [Route("api/[controller]")]
 public class IssuesController(
     IIssueRepository issueRepo,

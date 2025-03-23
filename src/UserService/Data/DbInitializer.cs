@@ -25,20 +25,19 @@ public class DbInitializer
             var roles = new List<Role>
             {
                 new() {
-                    Name = "Root",
-                    CreatedBy = "root",
-                },
-                new() {
                     Name = "Admin",
-                    CreatedBy = "root",
+                    Code = "Admin",
+                    CreatedBy = "System",
                 },
                 new() {
                     Name = "Member",
-                    CreatedBy = "root",
+                    Code = "Member",
+                    CreatedBy = "System",
                 },
                 new() {
                     Name = "Viewer",
-                    CreatedBy = "root",
+                    Code = "Viewer",
+                    CreatedBy = "System",
                 },
             };
 

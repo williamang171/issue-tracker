@@ -3,11 +3,13 @@ using ProjectIssueService.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MassTransit;
 using ProjectIssueService.Consumers;
+using Microsoft.AspNetCore.Authorization;
+using ProjectIssueService.AuthorizationHandler;
+using ProjectIssueService.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
@@ -53,10 +55,12 @@ builder.Services.AddScoped<IIssueRepository, IssueRepository>();
 builder.Services.AddScoped<IProjectAssignmentRepository, ProjectAssignmentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddSingleton<IAuthorizationHandler, CustomRoleHandler>();
 
 var app = builder.Build();
 
 app.UseAuthentication();
+app.UseMiddleware<RolePopulationMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

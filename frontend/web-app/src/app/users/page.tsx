@@ -8,10 +8,11 @@ import {
     ShowButton,
     useTable,
 } from '@refinedev/antd';
-import { getDefaultFilter, type BaseRecord } from '@refinedev/core';
+import { getDefaultFilter, useList, type BaseRecord } from '@refinedev/core';
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, InputRef, Space, Table, theme } from 'antd';
 import { useRef } from 'react';
+import { RESOURCE } from '@app/constants/resource';
 
 export default function UserList() {
     const searchInput = useRef<InputRef>(null);
@@ -28,6 +29,10 @@ export default function UserList() {
         },
     });
     const { token } = theme.useToken();
+    const { data } = useList({
+        resource: `${RESOURCE.roles}`,
+    });
+    const roles = data?.data || [];
 
     return (
         <List canCreate={false}>
@@ -55,6 +60,18 @@ export default function UserList() {
                                 setTimeout(() => searchInput.current?.select(), 100);
                             }
                         },
+                    }}
+                />
+
+                <Table.Column
+                    dataIndex="roleId"
+                    title={'Role'}
+                    sorter
+                    render={(roleId) => {
+                        const role = roles.find((r) => r.id === roleId);
+                        return (<div>
+                            {role?.name}
+                        </div>)
                     }}
                 />
 

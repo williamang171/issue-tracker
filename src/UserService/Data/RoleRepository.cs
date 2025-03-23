@@ -16,6 +16,11 @@ public class RoleRepository(ApplicationDbContext context, IMapper mapper) : IRol
         return await _context.Roles.FirstOrDefaultAsync(x => x.Id == Id);
     }
 
+    public async Task<Role?> GetRoleEntityByCode(string Code)
+    {
+        return await _context.Roles.FirstOrDefaultAsync(x => x.Code == Code);
+    }
+
     public async Task<List<RoleDto>> GetRolesAsync()
     {
         var query = _context.Roles.AsQueryable();

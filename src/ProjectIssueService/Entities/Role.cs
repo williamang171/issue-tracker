@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProjectIssueService.Entities;
 
-[Table("Users")]
-[Index(nameof(UserName), IsUnique = true)]
-public class User
+[Table("Roles")]
+[Index(nameof(Name), IsUnique = true)]
+[Index(nameof(Code), IsUnique = true)]
+public class Role : BaseEntity
 {
     [Key]
     public Guid Id { get; set; }
-    public required string UserName { get; set; }
-    public Guid? RoleId { get; set; }
-    public Role? Role { get; set; }
+    public required string Code { get; set; }
+    public required string Name { get; set; }
 }

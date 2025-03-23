@@ -12,7 +12,7 @@ using UserService.Data;
 namespace UserService.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250322083038_Roles")]
+    [Migration("20250323023508_Roles")]
     partial class Roles
     {
         /// <inheritdoc />

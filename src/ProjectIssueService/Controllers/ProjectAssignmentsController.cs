@@ -51,7 +51,7 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
         return projectAssignment;
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost("bulk")]
     public async Task<ActionResult<BulkProjectAssignmentResultDto>> CreateBulkProjectAssignments(BulkProjectAssignmentCreateDto dto)
     {
@@ -101,7 +101,7 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
         return Ok(result);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<ProjectAssignmentDto>> CreateProjectAssignment(ProjectAssignmentCreateDto dto)
     {
@@ -143,7 +143,7 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
         return BadRequest("Failed to create project assignment");
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteProjectAssignment(Guid id)
     {

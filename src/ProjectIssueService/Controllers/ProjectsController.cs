@@ -45,8 +45,8 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
         return project;
     }
 
-    [Authorize]
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProjectDto>> CreateProject(ProjectCreateDto dto)
     {
         var project = mapper.Map<Project>(dto);
@@ -69,8 +69,8 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
         return BadRequest("Failed to create project");
     }
 
-    [Authorize]
     [HttpPatch("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> UpdateProject(Guid id, ProjectUpdateDto dto)
     {
         var project = await repo.GetProjectEntityById(id);
@@ -87,8 +87,8 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
         return BadRequest("Problem saving changes");
     }
 
-    [Authorize]
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteProject(Guid id)
     {
         var project = await repo.GetProjectEntityById(id);

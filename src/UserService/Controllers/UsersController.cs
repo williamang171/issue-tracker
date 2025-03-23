@@ -51,6 +51,7 @@ namespace UserService.Controllers
             }
 
             var roleId = dto.RoleId;
+            string? roleCode = null;
             if (roleId.HasValue)
             {
                 var role = await _roleRepo.GetRoleEntityById(roleId.Value);
@@ -58,9 +59,25 @@ namespace UserService.Controllers
                 {
                     return BadRequest("Role not found");
                 }
+                roleCode = role.Code;
             }
 
+            var oldUserDto = _mapper.Map<UserDto>(user);
             user.RoleId = dto.RoleId ?? user.RoleId;
+            var newUserDto = _mapper.Map<UserDto>(user);
+            if (roleCode != null)
+            {
+                newUserDto.RoleCode = roleCode;
+            }
+
+            UserUpdated userUpdated = new()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                OldValues = _mapper.Map<UserValues>(oldUserDto),
+                NewValues = _mapper.Map<UserValues>(newUserDto),
+            };
+            await publishEndpoint.Publish(userUpdated);
 
             await _userRepo.SaveChangesAsync();
             return Ok();
@@ -77,28 +94,23 @@ namespace UserService.Controllers
             }
             var user = await _userRepo.GetUserEntityByUserName(currentUsername);
 
+            // Update existing user
             if (user != null)
             {
-                var oldUserDto = _mapper.Map<UserDto>(user);
                 user.LastLoginTime = DateTime.UtcNow;
-                var newUserDto = _mapper.Map<UserDto>(user);
-                UserUpdated userUpdated = new()
-                {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    OldValues = _mapper.Map<UserValues>(oldUserDto),
-                    NewValues = _mapper.Map<UserValues>(newUserDto),
-                };
-                await publishEndpoint.Publish(userUpdated);
             }
+            // Create a new user and publish message
             else
             {
+                var viewerRole = await _roleRepo.GetRoleEntityByCode("viewer");
                 var newUserDto = new UserSyncLastLoginDto
                 {
                     UserName = currentUsername,
+                    LastLoginTime = DateTime.UtcNow,
+                    RoleId = viewerRole?.Id,
+                    RoleCode = viewerRole?.Code,
                 };
                 var newUser = _mapper.Map<User>(newUserDto);
-                newUser.LastLoginTime = DateTime.UtcNow;
                 _userRepo.AddUser(newUser);
                 var toPublish = _mapper.Map<UserDto>(newUser);
                 await publishEndpoint.Publish(_mapper.Map<UserCreated>(toPublish));

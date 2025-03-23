@@ -36,6 +36,7 @@ public class CommentsController(
         return comment;
     }
 
+    [Authorize(Roles = "Admin,Member")]
     [HttpPost]
     public async Task<ActionResult<CommentDto>> CreateComment(CommentCreateDto createCommentDto)
     {
@@ -58,6 +59,7 @@ public class CommentsController(
         return BadRequest("Failed to create comment");
     }
 
+    [Authorize(Roles = "Admin,Member")]
     [HttpPatch("{id}")]
     public async Task<IActionResult> UpdateComment(Guid id, CommentUpdateDto dto)
     {
@@ -70,6 +72,7 @@ public class CommentsController(
         return Ok();
     }
 
+    [Authorize(Roles = "Admin,Member")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteComment(Guid id)
     {
