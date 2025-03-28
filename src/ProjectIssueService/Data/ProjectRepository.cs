@@ -22,10 +22,17 @@ public class ProjectRepository(ApplicationDbContext context, IMapper mapper) : I
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
+    public async Task<ProjectDto?> GetProjectByIdAndProjectAssigneeAsync(Guid id, string projectAssignee)
+    {
+        return await context.Projects
+            .Where(x => x.ProjectAssignments.Any(pa => pa.UserName == projectAssignee))
+            .ProjectTo<ProjectDto>(mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task<Project?> GetProjectEntityById(Guid id)
     {
         return await context.Projects
-            // .Include(x => x.Item)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
@@ -41,13 +48,18 @@ public class ProjectRepository(ApplicationDbContext context, IMapper mapper) : I
         return await query.ProjectTo<ProjectForSelectDto>(mapper.ConfigurationProvider).ToListAsync();
     }
 
-    public async Task<PagedList<ProjectDto>> GetProjectsPaginatedAsync(ProjectParams parameters)
+    public async Task<PagedList<ProjectDto>> GetProjectsPaginatedAsync(ProjectParams parameters, string? projectAssignee)
     {
         var query = context.Projects.AsQueryable();
 
         if (!string.IsNullOrEmpty(parameters.Name_Like))
         {
             query = query.Where(s => s.Name.Contains(parameters.Name_Like));
+        }
+
+        if (projectAssignee != null)
+        {
+            query = query.Where(x => x.ProjectAssignments.Any(pa => pa.UserName == projectAssignee));
         }
 
         switch (parameters._sort)

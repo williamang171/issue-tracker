@@ -37,7 +37,7 @@ public class IssueRepository(ApplicationDbContext context, IMapper mapper) : IIs
         return await query.ProjectTo<IssueDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
-    public async Task<PagedList<IssueDto>> GetIssuesPaginatedAsync(IssueParams parameters)
+    public async Task<PagedList<IssueDto>> GetIssuesPaginatedAsync(IssueParams parameters, string? projectAssignee)
     {
         var query = _context.Issues.AsQueryable();
 
@@ -60,6 +60,10 @@ public class IssueRepository(ApplicationDbContext context, IMapper mapper) : IIs
         if (parameters.ProjectId.HasValue)
         {
             query = query.Where(s => s.ProjectId.Equals(parameters.ProjectId.Value));
+        }
+        if (projectAssignee != null)
+        {
+            query = query.Where(x => x.Project.ProjectAssignments.Any(pa => pa.UserName == projectAssignee));
         }
 
         switch (parameters._sort)

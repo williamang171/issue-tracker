@@ -6,7 +6,7 @@ using UserService.DTOs;
 
 namespace UserService.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class RolesController(

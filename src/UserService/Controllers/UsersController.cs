@@ -23,6 +23,7 @@ namespace UserService.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IMapper _mapper = mapper;
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<UserDto>>> GetUsers()
         {
@@ -30,6 +31,7 @@ namespace UserService.Controllers
             return response;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{username}")]
         public async Task<ActionResult<UserDto>> GetUserByUserName(string username)
         {
@@ -41,6 +43,7 @@ namespace UserService.Controllers
             return response;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("{username}")]
         public async Task<ActionResult> UpdateUser(string username, UserUpdateDto dto)
         {
@@ -102,7 +105,7 @@ namespace UserService.Controllers
             // Create a new user and publish message
             else
             {
-                var viewerRole = await _roleRepo.GetRoleEntityByCode("viewer");
+                var viewerRole = await _roleRepo.GetRoleEntityByCode("Viewer");
                 var newUserDto = new UserSyncLastLoginDto
                 {
                     UserName = currentUsername,

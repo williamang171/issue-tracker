@@ -6,6 +6,7 @@ using ProjectIssueService.Consumers;
 using Microsoft.AspNetCore.Authorization;
 using ProjectIssueService.AuthorizationHandler;
 using ProjectIssueService.Middlewares;
+using ProjectIssueService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,7 @@ builder.Services.AddScoped<IIssueRepository, IssueRepository>();
 builder.Services.AddScoped<IProjectAssignmentRepository, ProjectAssignmentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IProjectAssignmentServices, ProjectAssignmentServices>();
 builder.Services.AddSingleton<IAuthorizationHandler, CustomRoleHandler>();
 
 var app = builder.Build();

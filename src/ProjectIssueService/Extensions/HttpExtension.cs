@@ -21,5 +21,27 @@ namespace ProjectIssueService.Extensions
 
             return string.Empty;
         }
+
+        public static Boolean CurrentUserRoleIsAdmin(this HttpContext context)
+        {
+            var UserRole = GetUserRole(context);
+            return UserRole == UserRoles.Admin;
+        }
+
+        public static Boolean CurrentUserRoleIsMember(this HttpContext context)
+        {
+            var UserRole = GetUserRole(context);
+            return UserRole == UserRoles.Member;
+        }
+
+        public static Boolean CurrentUserRoleIsViewer(this HttpContext context)
+        {
+            var UserRole = GetUserRole(context);
+            return UserRole == UserRoles.Viewer;
+        }
+        public static string? GetCurrentUserName(this HttpContext context)
+        {
+            return context.User.Identity?.Name;
+        }
     }
 }

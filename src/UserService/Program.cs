@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using UserService.Data;
 using MassTransit;
+using UserService.Middlewares;
+using Microsoft.AspNetCore.Authorization;
+using UserService.AuthorizationHandler;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,10 +49,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddSingleton<IAuthorizationHandler, CustomRoleHandler>();
 
 var app = builder.Build();
 
 app.UseAuthentication();
+app.UseMiddleware<RolePopulationMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

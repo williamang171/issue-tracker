@@ -7,22 +7,35 @@ using ProjectIssueService.DTOs;
 using ProjectIssueService.Entities;
 using ProjectIssueService.Helpers;
 using ProjectIssueService.Extensions;
+using ProjectIssueService.Services;
+using MassTransit;
+using Contracts;
 
 namespace ProjectIssueService.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IProjectRepository projectRepo, IUserRepository userRepo, IMapper mapper)
+public class ProjectAssignmentsController(
+    IProjectAssignmentRepository repo,
+    IProjectRepository projectRepo,
+    IUserRepository userRepo,
+    IMapper mapper,
+    IPublishEndpoint publishEndpoint,
+    IProjectAssignmentServices projectAssignmentServices
+    )
     : ControllerBase
 {
     [Authorize]
     [HttpGet]
     public async Task<ActionResult<List<ProjectAssignmentDto>>> GetProjectAssignmentsPaginated([FromQuery] ProjectAssignmentParams parameters)
     {
-        if (parameters.ProjectId == null)
-        {
-            return BadRequest("projectId is required");
-        }
+        // If no projectId is given, return an empty list
+        if (parameters.ProjectId == null) return new List<ProjectAssignmentDto>();
+
+        // If user is not assigned to project and is not an admin, return an empty list
+        var hasAccess = await projectAssignmentServices.CanCurrentUserAccessProject(parameters.ProjectId);
+        if (!hasAccess) return new List<ProjectAssignmentDto>();
+
         var response = await repo.GetProjectAssignmentsPaginatedAsync(parameters);
         Response.AddPaginationHeader(response.TotalCount);
         return response;
@@ -32,10 +45,13 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
     [HttpGet("all")]
     public async Task<ActionResult<List<ProjectAssignmentDto>>> GetProjectAssignments([FromQuery] ProjectAssignmentParams parameters)
     {
-        if (parameters.ProjectId == null)
-        {
-            return new List<ProjectAssignmentDto>();
-        }
+        // If no projectId is given, return an empty list
+        if (parameters.ProjectId == null) return new List<ProjectAssignmentDto>();
+
+        // If user is not assigned to project and is not an admin, return an empty list
+        var hasAccess = await projectAssignmentServices.CanCurrentUserAccessProject(parameters.ProjectId);
+        if (!hasAccess) return new List<ProjectAssignmentDto>();
+
         var response = await repo.GetProjectAssignmentsAsync(parameters);
         return response;
     }
@@ -45,8 +61,10 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
     public async Task<ActionResult<ProjectAssignmentDto>> GetProjectAssignmentById(Guid id)
     {
         var projectAssignment = await repo.GetProjectAssignmentByIdAsync(id);
-
         if (projectAssignment == null) return NotFound();
+
+        var hasAccess = await projectAssignmentServices.CanCurrentUserAccessProject(projectAssignment.ProjectId);
+        if (!hasAccess) return NotFound();
 
         return projectAssignment;
     }
@@ -57,6 +75,7 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
     {
         var projectId = dto.ProjectId;
         var project = await projectRepo.GetProjectByIdAsync(projectId);
+        var userNamesAdded = new List<string>();
 
         if (project == null)
         {
@@ -71,6 +90,7 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
         var existingAssignments = await repo.GetProjectAssignmentsByProjectIdAsync(projectId);
         var existingUserNames = existingAssignments.Select(a => a.UserName).ToHashSet();
         var result = new BulkProjectAssignmentResultDto();
+        var toPublish = new List<ProjectAssignmentCreated>();
 
         foreach (var userName in dto.UserNames)
         {
@@ -93,9 +113,16 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
             };
             var projectAssignment = mapper.Map<ProjectAssignment>(projectAssignmentCreateDto);
             repo.AddProjectAssignment(projectAssignment);
+            userNamesAdded.Add(userName);
             result.SuccessfulAssignments.Add(mapper.Map<BulkProjectAssignmentDto>(projectAssignment));
+            toPublish.Add(new ProjectAssignmentCreated()
+            {
+                ProjectId = projectId,
+                UserName = userName
+            });
         }
 
+        await publishEndpoint.PublishBatch(toPublish);
         await repo.SaveChangesAsync();
         result.Summary = $"Successfully assigned {result.SuccessfulAssignments.Count} out of {dto.UserNames.Count} users";
         return Ok(result);
@@ -131,6 +158,13 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
 
         var newProjectAssignment = mapper.Map<ProjectAssignmentDto>(projectAssignment);
 
+        var toPublish = new ProjectAssignmentCreated()
+        {
+            ProjectId = project.Id,
+            UserName = dto.UserName
+        };
+        await publishEndpoint.Publish(toPublish);
+
         if (await repo.SaveChangesAsync())
         {
             var newDto = await repo.GetProjectAssignmentByIdAsync(newProjectAssignment.Id);
@@ -152,6 +186,13 @@ public class ProjectAssignmentsController(IProjectAssignmentRepository repo, IPr
         if (entity == null) return NotFound();
 
         repo.RemoveProjectAssignment(entity);
+
+        var toPublish = new ProjectAssignmentDeleted()
+        {
+            ProjectId = entity.ProjectId,
+            UserName = entity.UserName,
+        };
+        await publishEndpoint.Publish(toPublish);
 
         var result = await repo.SaveChangesAsync();
 
