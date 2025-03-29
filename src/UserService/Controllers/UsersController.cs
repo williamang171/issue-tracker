@@ -102,7 +102,7 @@ namespace UserService.Controllers
             {
                 user.LastLoginTime = DateTime.UtcNow;
             }
-            // Create a new user and publish message
+            // Create a new user
             else
             {
                 var viewerRole = await _roleRepo.GetRoleEntityByCode("Viewer");
@@ -112,6 +112,7 @@ namespace UserService.Controllers
                     LastLoginTime = DateTime.UtcNow,
                     RoleId = viewerRole?.Id,
                     RoleCode = viewerRole?.Code,
+                    IsActive = true,
                 };
                 var newUser = _mapper.Map<User>(newUserDto);
                 _userRepo.AddUser(newUser);

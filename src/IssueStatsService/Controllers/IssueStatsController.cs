@@ -114,6 +114,12 @@ public class IssueStatsController(IConnectionMultiplexer muxer, IHttpContextAcce
             return false;
         }
 
+        // If user is not active, block access
+        if (userDto.IsActive != true)
+        {
+            return false;
+        }
+
         // Admin can view all stats data
         if (userDto.RoleCode == "Admin")
         {

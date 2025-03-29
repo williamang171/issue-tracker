@@ -40,6 +40,7 @@ public class UserUpdatedConsumer(IConnectionMultiplexer muxer) : IConsumer<UserU
 
         // Update user
         userDto.RoleCode = newValues.RoleCode ?? userDto.RoleCode;
+        userDto.IsActive = newValues.IsActive ?? userDto.IsActive;
         var jsonUser = JsonSerializer.Serialize(userDto);
         await db.StringSetAsync(key, jsonUser);
 

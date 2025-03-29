@@ -8,4 +8,5 @@ public class UserDto
     public string? UserName { get; set; }
     public DateTime? LastLoginTime { get; set; }
     public Guid? RoleId { get; set; }
+    public bool? IsActive { get; set; }
 }

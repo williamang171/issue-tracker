@@ -41,6 +41,7 @@ public class UserUpdatedConsumer(ApplicationDbContext dbContext) : IConsumer<Use
             }
             user.RoleId = role.Id;
         }
+        user.IsActive = newValues.IsActive ?? user.IsActive;
 
         await dbContext.SaveChangesAsync();
 
