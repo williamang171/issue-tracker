@@ -7,6 +7,7 @@ namespace UserService.Data;
 public class ApplicationDbContext(DbContextOptions options, IHttpContextAccessor httpContextAccessor) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<Role> Roles { get; set; }
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

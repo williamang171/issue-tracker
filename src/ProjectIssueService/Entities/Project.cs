@@ -10,4 +10,5 @@ public class Project : BaseEntity
     public required string Name { get; set; }
     public string? Description { get; set; }
     public ICollection<Issue> Issues { get; } = [];
+    public virtual ICollection<ProjectAssignment> ProjectAssignments { get; } = [];
 }

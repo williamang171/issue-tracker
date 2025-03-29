@@ -13,19 +13,77 @@ namespace UserService.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController(IUserRepository repo,
+    IRoleRepository roleRepo,
     IMapper mapper,
     IHttpContextAccessor httpContextAccessor,
     IPublishEndpoint publishEndpoint) : ControllerBase
     {
         private readonly IUserRepository _userRepo = repo;
+        private readonly IRoleRepository _roleRepo = roleRepo;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IMapper _mapper = mapper;
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<UserDto>>> GetUsers()
         {
             var response = await _userRepo.GetUsersAsync();
             return response;
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("{username}")]
+        public async Task<ActionResult<UserDto>> GetUserByUserName(string username)
+        {
+            var response = await _userRepo.GetUserByUserNameAsync(username);
+            if (response == null)
+            {
+                return NotFound();
+            }
+            return response;
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("{username}")]
+        public async Task<ActionResult> UpdateUser(string username, UserUpdateDto dto)
+        {
+            var user = await _userRepo.GetUserEntityByUserName(username);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var roleId = dto.RoleId;
+            string? roleCode = null;
+            if (roleId.HasValue)
+            {
+                var role = await _roleRepo.GetRoleEntityById(roleId.Value);
+                if (role == null)
+                {
+                    return BadRequest("Role not found");
+                }
+                roleCode = role.Code;
+            }
+
+            var oldUserDto = _mapper.Map<UserDto>(user);
+            user.RoleId = dto.RoleId ?? user.RoleId;
+            var newUserDto = _mapper.Map<UserDto>(user);
+            if (roleCode != null)
+            {
+                newUserDto.RoleCode = roleCode;
+            }
+
+            UserUpdated userUpdated = new()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                OldValues = _mapper.Map<UserValues>(oldUserDto),
+                NewValues = _mapper.Map<UserValues>(newUserDto),
+            };
+            await publishEndpoint.Publish(userUpdated);
+
+            await _userRepo.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpPost]
@@ -39,28 +97,23 @@ namespace UserService.Controllers
             }
             var user = await _userRepo.GetUserEntityByUserName(currentUsername);
 
+            // Update existing user
             if (user != null)
             {
-                var oldUserDto = _mapper.Map<UserDto>(user);
                 user.LastLoginTime = DateTime.UtcNow;
-                var newUserDto = _mapper.Map<UserDto>(user);
-                UserUpdated userUpdated = new()
-                {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    OldValues = _mapper.Map<UserValues>(oldUserDto),
-                    NewValues = _mapper.Map<UserValues>(newUserDto),
-                };
-                await publishEndpoint.Publish(userUpdated);
             }
+            // Create a new user and publish message
             else
             {
+                var viewerRole = await _roleRepo.GetRoleEntityByCode("Viewer");
                 var newUserDto = new UserSyncLastLoginDto
                 {
                     UserName = currentUsername,
+                    LastLoginTime = DateTime.UtcNow,
+                    RoleId = viewerRole?.Id,
+                    RoleCode = viewerRole?.Code,
                 };
                 var newUser = _mapper.Map<User>(newUserDto);
-                newUser.LastLoginTime = DateTime.UtcNow;
                 _userRepo.AddUser(newUser);
                 var toPublish = _mapper.Map<UserDto>(newUser);
                 await publishEndpoint.Publish(_mapper.Map<UserCreated>(toPublish));

@@ -88,4 +88,11 @@ public class ProjectAssignmentRepository(ApplicationDbContext context, IMapper m
     {
         return await _context.SaveChangesAsync() > 0;
     }
+
+    public async Task<ProjectAssignment?> GetProjectAssignmentEntityByProjectIdAndUserName(Guid projectId, string userName)
+    {
+        return await _context.ProjectAssignments
+            .Where(x => x.ProjectId == projectId && x.UserName == userName)
+            .FirstOrDefaultAsync();
+    }
 }

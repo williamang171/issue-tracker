@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -32,7 +33,14 @@ builder.Services.AddMassTransit(x =>
         cfg.ConfigureEndpoints(context);
 
         // Additional configuration for retries
-        cfg.UseMessageRetry(r => r.Interval(5, 5));
+        cfg.UseMessageRetry(r =>
+        {
+            r.Exponential(5,                   // Max retry attempts
+                TimeSpan.FromMilliseconds(100), // Initial delay
+                TimeSpan.FromSeconds(10),       // Maximum delay
+                TimeSpan.FromSeconds(2)         // Delay multiplier
+             );
+        });
     });
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

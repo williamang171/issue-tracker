@@ -3,6 +3,7 @@ using System.Text.Json;
 using AutoMapper;
 using Contracts;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using ProjectIssueService.Data;
 using ProjectIssueService.DTOs;
 using ProjectIssueService.Entities;
@@ -22,11 +23,15 @@ public class UserCreatedConsumer(ApplicationDbContext dbContext, IMapper mapper)
         var message = context.Message;
         var userName = message.UserName;
         var lastLoginTime = message.LastLoginTime;
+        var roleCode = message.RoleCode;
+
+        var role = await dbContext.Roles.FirstOrDefaultAsync(x => x.Code == roleCode);
 
         UserDto userDto = new()
         {
             UserName = userName,
             LastLoginTime = lastLoginTime,
+            RoleId = role?.Id,
         };
         var user = mapper.Map<User>(userDto);
         dbContext.Users.Add(user);

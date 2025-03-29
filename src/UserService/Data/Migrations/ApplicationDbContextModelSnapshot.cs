@@ -192,6 +192,44 @@ namespace UserService.Data.Migrations
                     b.ToTable("OutboxState");
                 });
 
+            modelBuilder.Entity("UserService.Entities.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("UserService.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -208,6 +246,9 @@ namespace UserService.Data.Migrations
                     b.Property<DateTime?>("LastLoginTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("RoleId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("text");
 
@@ -220,10 +261,21 @@ namespace UserService.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RoleId");
+
                     b.HasIndex("UserName")
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("UserService.Entities.User", b =>
+                {
+                    b.HasOne("UserService.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId");
+
+                    b.Navigation("Role");
                 });
 #pragma warning restore 612, 618
         }

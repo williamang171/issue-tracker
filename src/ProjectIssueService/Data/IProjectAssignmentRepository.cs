@@ -11,6 +11,7 @@ public interface IProjectAssignmentRepository
     Task<PagedList<ProjectAssignmentDto>> GetProjectAssignmentsPaginatedAsync(ProjectAssignmentParams parameters);
     Task<ProjectAssignmentDto?> GetProjectAssignmentByIdAsync(Guid id);
     Task<ProjectAssignment?> GetProjectAssignmentEntityById(Guid id);
+    Task<ProjectAssignment?> GetProjectAssignmentEntityByProjectIdAndUserName(Guid projectId, string userName);
     Task<IEnumerable<ProjectAssignment>> GetProjectAssignmentsByProjectIdAsync(Guid projectId);
     void AddProjectAssignment(ProjectAssignment projectAssignment);
     void RemoveProjectAssignment(ProjectAssignment projectAssignment);

@@ -4,16 +4,20 @@ import { DashboardCharts } from "@components/dashboard";
 import { UsersList } from "@components/project-assignments/List";
 import { useGetProjectChartsData } from "@hooks/useGetProjectChartsData";
 import { Edit, useForm, } from "@refinedev/antd";
-import { Form, Input } from "antd";
+import { Alert, Form, Input } from "antd";
 
 export default function ProjectEdit() {
   const { formProps, saveButtonProps, query: queryResult } = useForm({});
   const { issuePriorityCountData, issueStatusCountData, issueTypeCountData } = useGetProjectChartsData();
 
+  if (queryResult?.status === 'error') {
+    return <Alert type="error" message="Not Found" />
+  }
+
   return (
     <div>
-      <Edit saveButtonProps={saveButtonProps} >
-        <Form {...formProps} layout="vertical">
+      <Edit saveButtonProps={saveButtonProps} isLoading={queryResult?.status === 'loading'}>
+        <Form {...formProps} layout="vertical" >
           <Form.Item
             label={"Name"}
             name={["name"]}

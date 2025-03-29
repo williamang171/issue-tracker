@@ -7,4 +7,5 @@ public class CommentDto : BaseDto
 {
     public Guid Id { get; set; }
     public required string Content { get; set; }
+    public Guid IssueId { get; set; }
 }

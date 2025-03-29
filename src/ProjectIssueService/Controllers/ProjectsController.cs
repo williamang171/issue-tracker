@@ -9,28 +9,34 @@ using ProjectIssueService.Entities;
 using Contracts;
 using ProjectIssueService.Helpers;
 using ProjectIssueService.Extensions;
+using ProjectIssueService.Services;
 
 namespace ProjectIssueService.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublishEndpoint publishEndpoint)
+public class ProjectsController(
+    IProjectRepository repo,
+    IMapper mapper,
+    IPublishEndpoint publishEndpoint,
+    IProjectAssignmentServices projectAssignmentServices
+    )
     : ControllerBase
 {
     [Authorize]
     [HttpGet]
     public async Task<ActionResult<List<ProjectDto>>> GetProjects([FromQuery] ProjectParams parameters)
     {
-        var response = await repo.GetProjectsPaginatedAsync(parameters);
-        Response.AddPaginationHeader(response.TotalCount);
-        return response;
-    }
+        // Return empty list if userName not found
+        var userName = HttpContext.GetCurrentUserName();
+        if (string.IsNullOrEmpty(userName)) return Ok(Array.Empty<string>());
 
-    [Authorize]
-    [HttpGet("all")]
-    public async Task<ActionResult<List<ProjectForSelectDto>>> GetProjectAssignmentsAll()
-    {
-        var response = await repo.GetProjectsForSelectAsync();
+        // Get projects based on role (if isAdmin get all projects)
+        var isAdmin = HttpContext.CurrentUserRoleIsAdmin();
+        var response = isAdmin ?
+            await repo.GetProjectsPaginatedAsync(parameters, null) :
+            await repo.GetProjectsPaginatedAsync(parameters, userName);
+        Response.AddPaginationHeader(response.TotalCount);
         return response;
     }
 
@@ -38,21 +44,31 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
     [HttpGet("{id}")]
     public async Task<ActionResult<ProjectDto>> GetProjectById(Guid id)
     {
+        // Check if project exists
         var project = await repo.GetProjectByIdAsync(id);
-
         if (project == null) return NotFound();
+
+        // Check if user has access to project
+        var hasAccess = await projectAssignmentServices.CanCurrentUserAccessProject(project.Id);
+        if (!hasAccess) return NotFound();
 
         return project;
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+    [HttpGet("all")]
+    public async Task<ActionResult<List<ProjectForSelectDto>>> GetProjectsAll()
+    {
+        var response = await repo.GetProjectsForSelectAsync();
+        return response;
+    }
+
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProjectDto>> CreateProject(ProjectCreateDto dto)
     {
         var project = mapper.Map<Project>(dto);
-
         repo.AddProject(project);
-
         var newProject = mapper.Map<ProjectDto>(project);
 
         // await publishEndpoint.Publish(mapper.Map<ProjectCreated>(newProject));
@@ -69,8 +85,8 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
         return BadRequest("Failed to create project");
     }
 
-    [Authorize]
     [HttpPatch("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> UpdateProject(Guid id, ProjectUpdateDto dto)
     {
         var project = await repo.GetProjectEntityById(id);
@@ -87,8 +103,8 @@ public class ProjectsController(IProjectRepository repo, IMapper mapper, IPublis
         return BadRequest("Problem saving changes");
     }
 
-    [Authorize]
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteProject(Guid id)
     {
         var project = await repo.GetProjectEntityById(id);

@@ -8,7 +8,7 @@ namespace ProjectIssueService.Data;
 public interface IIssueRepository
 {
     Task<List<IssueDto>> GetIssuesAsync();
-    Task<PagedList<IssueDto>> GetIssuesPaginatedAsync(IssueParams parameters);
+    Task<PagedList<IssueDto>> GetIssuesPaginatedAsync(IssueParams parameters, string? projectAssignee);
     Task<IssueDto?> GetIssueByIdAsync(Guid id);
     Task<Issue?> GetIssueEntityById(Guid id);
     void AddIssue(Issue issue);

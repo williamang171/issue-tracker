@@ -338,10 +338,51 @@ namespace ProjectIssueService.Data.Migrations
                     b.ToTable("ProjectAssignments");
                 });
 
+            modelBuilder.Entity("ProjectIssueService.Entities.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("ProjectIssueService.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("RoleId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("UserName")
@@ -349,6 +390,8 @@ namespace ProjectIssueService.Data.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.HasIndex("UserName")
                         .IsUnique();
@@ -387,6 +430,15 @@ namespace ProjectIssueService.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("ProjectIssueService.Entities.User", b =>
+                {
+                    b.HasOne("ProjectIssueService.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("ProjectIssueService.Entities.Project", b =>

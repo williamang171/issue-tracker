@@ -10,8 +10,10 @@ import IssueFormItem from './IssueFormItem';
 // import { useRouter } from 'next/navigation';
 // import { useRouter } from 'next/router';
 import { useRouter } from 'next/compat/router';
+import { useBack } from '@refinedev/core';
 
 export default function IssueCreate() {
+  const back = useBack();
   const { formProps, saveButtonProps, form } = useForm<any, any, any>({});
   const { selectProps: projectSelectProps } = useSelect({
     resource: 'projects/all',

@@ -12,4 +12,6 @@ public class User
     [Key]
     public Guid Id { get; set; }
     public required string UserName { get; set; }
+    public Guid? RoleId { get; set; }
+    public Role? Role { get; set; }
 }
