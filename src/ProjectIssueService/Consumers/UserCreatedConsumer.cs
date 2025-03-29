@@ -24,6 +24,7 @@ public class UserCreatedConsumer(ApplicationDbContext dbContext, IMapper mapper)
         var userName = message.UserName;
         var lastLoginTime = message.LastLoginTime;
         var roleCode = message.RoleCode;
+        var isActive = message.IsActive;
 
         var role = await dbContext.Roles.FirstOrDefaultAsync(x => x.Code == roleCode);
 
@@ -32,6 +33,7 @@ public class UserCreatedConsumer(ApplicationDbContext dbContext, IMapper mapper)
             UserName = userName,
             LastLoginTime = lastLoginTime,
             RoleId = role?.Id,
+            IsActive = isActive,
         };
         var user = mapper.Map<User>(userDto);
         dbContext.Users.Add(user);

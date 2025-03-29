@@ -14,4 +14,5 @@ public class User
     public required string UserName { get; set; }
     public Guid? RoleId { get; set; }
     public Role? Role { get; set; }
+    public bool IsActive { get; set; }
 }

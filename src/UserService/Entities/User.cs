@@ -15,4 +15,5 @@ public class User : BaseEntity
     public DateTime? LastLoginTime { get; set; }
     public Guid? RoleId { get; set; }
     public Role? Role { get; set; }
+    public bool IsActive { get; set; }
 }

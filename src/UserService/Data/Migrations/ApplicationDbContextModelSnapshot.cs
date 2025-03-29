@@ -243,6 +243,9 @@ namespace UserService.Data.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime?>("LastLoginTime")
                         .HasColumnType("timestamp with time zone");
 

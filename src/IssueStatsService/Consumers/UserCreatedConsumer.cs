@@ -20,10 +20,12 @@ public class UserCreatedConsumer(IConnectionMultiplexer muxer) : IConsumer<UserC
         var message = context.Message;
         var userName = message.UserName;
         var roleCode = message.RoleCode;
+        var isActive = message.IsActive;
         var user = new UserDto()
         {
             UserName = userName,
             RoleCode = roleCode,
+            IsActive = isActive
         };
         var jsonUser = JsonSerializer.Serialize(user);
 

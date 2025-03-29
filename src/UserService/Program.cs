@@ -54,6 +54,7 @@ builder.Services.AddSingleton<IAuthorizationHandler, CustomRoleHandler>();
 var app = builder.Build();
 
 app.UseAuthentication();
+app.UseMiddleware<UserIsActiveMiddleware>();
 app.UseMiddleware<RolePopulationMiddleware>();
 app.UseAuthorization();
 
