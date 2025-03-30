@@ -41,6 +41,11 @@ builder.Services.AddMassTransit(x =>
         });
 
         cfg.ConfigureEndpoints(context);
+
+        cfg.UseMessageRetry(r =>
+        {
+            r.Interval(retryCount: 5, interval: TimeSpan.FromSeconds(5));
+        });
     });
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

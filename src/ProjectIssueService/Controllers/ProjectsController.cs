@@ -68,10 +68,12 @@ public class ProjectsController(
     public async Task<ActionResult<ProjectDto>> CreateProject(ProjectCreateDto dto)
     {
         var project = mapper.Map<Project>(dto);
+        var version = Guid.NewGuid();
+        project.Version = version;
         repo.AddProject(project);
         var newProject = mapper.Map<ProjectDto>(project);
 
-        // await publishEndpoint.Publish(mapper.Map<ProjectCreated>(newProject));
+        await publishEndpoint.Publish(mapper.Map<ProjectCreated>(newProject));
 
         if (await repo.SaveChangesAsync())
         {

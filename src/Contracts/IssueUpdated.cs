@@ -2,7 +2,7 @@ using System;
 
 namespace Contracts;
 
-public class IssueUpdated
+public class IssueUpdated : BaseUpdateMessage
 {
     public Guid Id { get; set; }
     public IssueValues NewValues { get; set; }

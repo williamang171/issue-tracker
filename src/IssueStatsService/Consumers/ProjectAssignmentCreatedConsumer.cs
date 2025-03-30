@@ -1,9 +1,9 @@
 using System;
 using System.Text.Json;
 using Contracts;
-using IssueStatsService.Exceptions;
 using MassTransit;
 using StackExchange.Redis;
+using IssueStatsService.Helpers;
 
 namespace IssueStatsService.Consumers;
 
@@ -24,7 +24,7 @@ public class ProjectAssignmentCreatedConsumer(IConnectionMultiplexer muxer) : IC
 
         IDatabase db = muxer.GetDatabase();
 
-        string setKey = $"project:{projectId}:users";
+        string setKey = Constants.GetProjectAssignmenstKey(projectId);
 
         // Check if user already exists in set
         var contains = await db.SetContainsAsync(setKey, userName);
@@ -34,7 +34,7 @@ public class ProjectAssignmentCreatedConsumer(IConnectionMultiplexer muxer) : IC
         }
         else
         {
-            throw new OptimisticConcurrencyException($"User ${userName} already exists in project ${projectId}");
+            throw new MessageException(typeof(ProjectAssignmentCreated), $"User ${userName} already exists in project ${projectId}");
         }
 
         Console.WriteLine("--> Consumed Project Assignment Created: " + context.MessageId);

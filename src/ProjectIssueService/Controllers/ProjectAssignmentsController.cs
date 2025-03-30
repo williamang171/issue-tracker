@@ -17,6 +17,7 @@ namespace ProjectIssueService.Controllers;
 [Route("api/[controller]")]
 public class ProjectAssignmentsController(
     IProjectAssignmentRepository repo,
+    IIssueRepository issueRepo,
     IProjectRepository projectRepo,
     IUserRepository userRepo,
     IMapper mapper,
@@ -75,7 +76,6 @@ public class ProjectAssignmentsController(
     {
         var projectId = dto.ProjectId;
         var project = await projectRepo.GetProjectByIdAsync(projectId);
-        var userNamesAdded = new List<string>();
 
         if (project == null)
         {
@@ -112,13 +112,15 @@ public class ProjectAssignmentsController(
                 UserName = userName,
             };
             var projectAssignment = mapper.Map<ProjectAssignment>(projectAssignmentCreateDto);
+            var version = Guid.NewGuid();
+            projectAssignment.Version = version;
             repo.AddProjectAssignment(projectAssignment);
-            userNamesAdded.Add(userName);
             result.SuccessfulAssignments.Add(mapper.Map<BulkProjectAssignmentDto>(projectAssignment));
             toPublish.Add(new ProjectAssignmentCreated()
             {
                 ProjectId = projectId,
-                UserName = userName
+                UserName = userName,
+                Version = version,
             });
         }
 
@@ -153,6 +155,7 @@ public class ProjectAssignmentsController(
         }
 
         var projectAssignment = mapper.Map<ProjectAssignment>(dto);
+        projectAssignment.Version = Guid.NewGuid();
 
         repo.AddProjectAssignment(projectAssignment);
 
@@ -161,7 +164,8 @@ public class ProjectAssignmentsController(
         var toPublish = new ProjectAssignmentCreated()
         {
             ProjectId = project.Id,
-            UserName = dto.UserName
+            UserName = dto.UserName,
+            Version = newProjectAssignment.Version,
         };
         await publishEndpoint.Publish(toPublish);
 
@@ -185,12 +189,20 @@ public class ProjectAssignmentsController(
 
         if (entity == null) return NotFound();
 
+        var userName = entity.UserName;
         repo.RemoveProjectAssignment(entity);
+
+        var tasksAssignedToUser = await issueRepo.GetIssueEntitiesAssignedToUser(userName);
+        foreach (var task in tasksAssignedToUser)
+        {
+            task.Assignee = null;
+        }
 
         var toPublish = new ProjectAssignmentDeleted()
         {
             ProjectId = entity.ProjectId,
             UserName = entity.UserName,
+            Version = entity.Version
         };
         await publishEndpoint.Publish(toPublish);
 

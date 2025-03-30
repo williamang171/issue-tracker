@@ -9,4 +9,5 @@ public class UserDto
     public DateTime? LastLoginTime { get; set; }
     public Guid? RoleId { get; set; }
     public bool? IsActive { get; set; }
+    public Guid Version { get; set; }
 }

@@ -87,6 +87,7 @@ public class IssuesController(
         // Create issue and publish it
         var issue = _mapper.Map<Issue>(createIssueDto);
         _issueRepo.AddIssue(issue);
+        issue.Version = Guid.NewGuid();
         var newIssue = _mapper.Map<IssueDto>(issue);
         await publishEndpoint.Publish(_mapper.Map<IssueCreated>(newIssue));
         if (await _issueRepo.SaveChangesAsync())
@@ -128,12 +129,15 @@ public class IssuesController(
 
         // Update entity fields
         var oldIssue = _mapper.Map<IssueDto>(issue);
+        var oldVersion = oldIssue.Version;
+        var newVersion = Guid.NewGuid();
         issue.Name = dto.Name ?? issue.Name;
         issue.Description = dto.Description ?? issue.Description;
         issue.Status = dto.Status ?? issue.Status;
         issue.Priority = dto.Priority ?? issue.Priority;
         issue.Type = dto.Type ?? issue.Type;
         issue.Assignee = dto.Assignee ?? issue.Assignee;
+        issue.Version = newVersion;
         var newIssue = _mapper.Map<IssueDto>(issue);
 
         // Publish IssueUpdated and save changes
@@ -143,6 +147,8 @@ public class IssuesController(
             OldValues = _mapper.Map<IssueValues>(oldIssue),
             NewValues = _mapper.Map<IssueValues>(newIssue),
             ProjectId = issue.ProjectId,
+            OldVersion = oldVersion,
+            NewVersion = newVersion,
         };
         await publishEndpoint.Publish(issueUpdated);
         if (await _issueRepo.SaveChangesAsync()) return Ok();

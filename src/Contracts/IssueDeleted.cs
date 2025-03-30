@@ -2,7 +2,7 @@ using System;
 
 namespace Contracts;
 
-public class IssueDeleted
+public class IssueDeleted : BaseDeleteMessage
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }

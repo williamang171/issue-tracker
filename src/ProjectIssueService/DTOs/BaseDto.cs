@@ -8,4 +8,5 @@ public class BaseDto
     public DateTime? UpdatedTime { get; set; }
     public required string CreatedBy { get; set; }
     public string? UpdatedBy { get; set; }
+    public Guid Version { get; set; }
 }

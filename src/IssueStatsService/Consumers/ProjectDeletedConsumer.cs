@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using Contracts;
+using IssueStatsService.Helpers;
 using MassTransit;
 using StackExchange.Redis;
 
@@ -10,23 +11,41 @@ public class ProjectDeletedConsumer(IConnectionMultiplexer muxer) : IConsumer<Pr
 {
     public async Task Consume(ConsumeContext<ProjectDeleted> context)
     {
-        Console.WriteLine("--> Consuming Project Deleted: " + context.Message.Id);
+        Console.WriteLine("--> Consuming Project Deleted: " + context.MessageId);
+
+        // For Debugging
+        var messageJsonString = JsonSerializer.Serialize(context.Message, new JsonSerializerOptions { WriteIndented = true });
+        Console.WriteLine(messageJsonString);
+
+        // Extract data
         var message = context.Message;
         var projectId = message.Id;
 
+        // Redis Keys
+        var projectKey = Constants.GetProjectKey(projectId);
+        var projectIssueVersionKey = Constants.GetProjectIssueVersionKey(projectId);
+        var projectStatusCountsKey = Constants.GetProjectIssueStatusCountsKey(projectId);
+        var projectPriorityCountsKey = Constants.GetProjectIssuePriorityCountsKey(projectId);
+        var projectTypeCountsKey = Constants.GetProjectIssueTypeCountsKey(projectId);
+        var projectAssignmentsKey = Constants.GetProjectAssignmenstKey(projectId);
+
         IDatabase db = muxer.GetDatabase();
         ITransaction transaction = db.CreateTransaction();
-        _ = transaction.KeyExpireAsync($"project:{projectId}:status-counts", TimeSpan.FromHours(1));
-        _ = transaction.KeyExpireAsync($"project:{projectId}:priority-counts", TimeSpan.FromHours(1));
-        _ = transaction.KeyExpireAsync($"project:{projectId}:type-counts", TimeSpan.FromHours(1));
+        _ = transaction.AddCondition(Condition.KeyExists(projectKey));
+        _ = transaction.KeyDeleteAsync(projectStatusCountsKey);
+        _ = transaction.KeyDeleteAsync(projectPriorityCountsKey);
+        _ = transaction.KeyDeleteAsync(projectTypeCountsKey);
+        _ = transaction.KeyDeleteAsync(projectKey);
+        _ = transaction.KeyDeleteAsync(projectIssueVersionKey);
+        _ = transaction.KeyDeleteAsync(projectAssignmentsKey);
 
         bool committed = await transaction.ExecuteAsync();
 
         if (!committed)
         {
-            throw new RedisException("--> Failed to commit transaction when consuming Project Deleted: " + context.Message.Id);
+            throw new MessageException(typeof(ProjectDeleted), "--> Failed to commit transaction when consuming Project Deleted: " + context.MessageId);
         }
 
-        Console.WriteLine("--> Consumed Project Deleted: " + context.Message.Id);
+        Console.WriteLine("--> Consumed Project Deleted: " + context.MessageId);
     }
 }

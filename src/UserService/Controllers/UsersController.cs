@@ -66,7 +66,12 @@ namespace UserService.Controllers
             }
 
             var oldUserDto = _mapper.Map<UserDto>(user);
+            var newVersion = Guid.NewGuid();
+            var oldVersion = oldUserDto.Version;
+
             user.RoleId = dto.RoleId ?? user.RoleId;
+            user.Version = newVersion;
+
             var newUserDto = _mapper.Map<UserDto>(user);
             if (roleCode != null)
             {
@@ -79,6 +84,8 @@ namespace UserService.Controllers
                 UserName = user.UserName,
                 OldValues = _mapper.Map<UserValues>(oldUserDto),
                 NewValues = _mapper.Map<UserValues>(newUserDto),
+                OldVersion = oldVersion,
+                NewVersion = newVersion,
             };
             await publishEndpoint.Publish(userUpdated);
 
@@ -105,25 +112,41 @@ namespace UserService.Controllers
             // Create a new user
             else
             {
-                var viewerRole = await _roleRepo.GetRoleEntityByCode("Viewer");
-                var newUserDto = new UserSyncLastLoginDto
+                var viewerRole = await GetDefaultRoleForUserName(currentUsername);
+                var newUserDto = new UserSyncDto
                 {
                     UserName = currentUsername,
                     LastLoginTime = DateTime.UtcNow,
                     RoleId = viewerRole?.Id,
                     RoleCode = viewerRole?.Code,
                     IsActive = true,
+                    Version = Guid.NewGuid()
                 };
                 var newUser = _mapper.Map<User>(newUserDto);
                 _userRepo.AddUser(newUser);
-                var toPublish = _mapper.Map<UserDto>(newUser);
-                await publishEndpoint.Publish(_mapper.Map<UserCreated>(toPublish));
+                var toPublish = _mapper.Map<UserCreated>(newUser);
+                toPublish.RoleCode = viewerRole?.Code;
+                await publishEndpoint.Publish(_mapper.Map<UserCreated>(newUser));
             }
             if (await _userRepo.SaveChangesAsync())
             {
                 return Ok();
             }
             return BadRequest("Failed to update user:sync");
+        }
+
+        // Return specific role for reserved usernames
+        private async Task<Role?> GetDefaultRoleForUserName(string userName)
+        {
+            List<string> userList = ["alice", "bob"];
+            if (userList.Contains(userName))
+            {
+                var adminRole = await _roleRepo.GetRoleEntityByCode("Admin");
+                return adminRole;
+            }
+
+            var viewerRole = await _roleRepo.GetRoleEntityByCode("Viewer");
+            return viewerRole;
         }
     }
 }

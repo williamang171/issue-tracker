@@ -2,7 +2,7 @@ using System;
 
 namespace Contracts;
 
-public class ProjectDeleted : BaseDeleteMessage
+public class ProjectCreated : BaseCreateMessage
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
