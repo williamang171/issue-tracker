@@ -2,7 +2,7 @@ using System;
 
 namespace Contracts;
 
-public class UserCreated
+public class UserCreated : BaseCreateMessage
 {
     public Guid Id { get; set; }
     public required string UserName { get; set; }

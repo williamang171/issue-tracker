@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json;
 using Contracts;
-using IssueStatsService.Exceptions;
+using IssueStatsService.Helpers;
 using MassTransit;
 using StackExchange.Redis;
 
@@ -24,7 +24,7 @@ public class ProjectAssignmentDeletedConsumer(IConnectionMultiplexer muxer) : IC
 
         IDatabase db = muxer.GetDatabase();
 
-        string setKey = $"project:{projectId}:users";
+        string setKey = Constants.GetProjectAssignmenstKey(projectId);
 
         // Check if user already exists in set
         var contains = await db.SetContainsAsync(setKey, userName);
@@ -34,7 +34,7 @@ public class ProjectAssignmentDeletedConsumer(IConnectionMultiplexer muxer) : IC
         }
         else
         {
-            throw new OptimisticConcurrencyException($"User ${userName} does not exist in project ${projectId}");
+            throw new MessageException(typeof(ProjectAssignmentDeleted), $"User ${userName} does not exist in project ${projectId}");
         }
 
         Console.WriteLine("--> Consumed Project Assignment Deleted: " + context.MessageId);

@@ -11,13 +11,14 @@ public class UserIsActiveMiddleware(RequestDelegate _next)
   public async Task InvokeAsync(HttpContext context, ApplicationDbContext dbContext)
   {
     var userName = context.User?.Identity?.Name;
+
     if (!string.IsNullOrEmpty(userName))
     {
       // Get the user from the service
       var user = await dbContext.Users.FirstOrDefaultAsync(x => x.UserName == userName);
 
-      // Check if user exists and is active
-      if (user == null || !user.IsActive)
+      // Check if user is active
+      if (user != null && !user.IsActive)
       {
         // User is not active, return an error response
         context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;

@@ -12,7 +12,7 @@ public class UserUpdatedConsumer(ApplicationDbContext dbContext) : IConsumer<Use
 {
     public async Task Consume(ConsumeContext<UserUpdated> context)
     {
-        Console.WriteLine("--> Consuming User Updated: " + context.Message.Id);
+        Console.WriteLine("--> Consuming User Updated: " + context.MessageId);
 
         // For Debugging
         var messageJsonString = JsonSerializer.Serialize(context.Message, new JsonSerializerOptions { WriteIndented = true });
@@ -22,13 +22,16 @@ public class UserUpdatedConsumer(ApplicationDbContext dbContext) : IConsumer<Use
         var userName = message.UserName;
         var oldValues = message.OldValues;
         var newValues = message.NewValues;
+        var oldVersion = message.OldVersion;
+        var newVersion = message.NewVersion;
 
-        var user = await dbContext.Users.FirstOrDefaultAsync(x => x.UserName == userName);
+        var user = await dbContext
+            .Users
+            .FirstOrDefaultAsync(x => x.UserName == userName && x.Version.Equals(oldVersion));
 
         if (user == null)
         {
-            Console.WriteLine("UserUpdatedConsumer: user not found");
-            return;
+            throw new MessageException(typeof(UserUpdated), $"User with UserName:{userName} and Version:{oldVersion} not found");
         }
 
         if (newValues.RoleCode != null)
@@ -36,15 +39,15 @@ public class UserUpdatedConsumer(ApplicationDbContext dbContext) : IConsumer<Use
             var role = await dbContext.Roles.FirstOrDefaultAsync(x => x.Code == newValues.RoleCode);
             if (role == null)
             {
-                Console.WriteLine("UserUpdatedConsumer: role not found");
-                return;
+                throw new MessageException(typeof(UserUpdated), $"Role with Code:{newValues.RoleCode} not found");
             }
             user.RoleId = role.Id;
         }
         user.IsActive = newValues.IsActive ?? user.IsActive;
+        user.Version = newVersion;
 
         await dbContext.SaveChangesAsync();
 
-        Console.WriteLine("--> Consumed User Updated: " + context.Message.Id);
+        Console.WriteLine("--> Consumed User Updated: " + context.MessageId);
     }
 }

@@ -4,6 +4,7 @@ using Contracts;
 using MassTransit;
 using StackExchange.Redis;
 using IssueStatsService.DTOs;
+using IssueStatsService.Helpers;
 
 namespace IssueStatsService.Consumers;
 
@@ -17,22 +18,26 @@ public class UserCreatedConsumer(IConnectionMultiplexer muxer) : IConsumer<UserC
         var messageJsonString = JsonSerializer.Serialize(context.Message, new JsonSerializerOptions { WriteIndented = true });
         Console.WriteLine(messageJsonString);
 
+        // Extract data
         var message = context.Message;
         var userName = message.UserName;
         var roleCode = message.RoleCode;
         var isActive = message.IsActive;
+        var version = message.Version;
+
         var user = new UserDto()
         {
             UserName = userName,
             RoleCode = roleCode,
-            IsActive = isActive
+            IsActive = isActive,
+            Version = version,
         };
         var jsonUser = JsonSerializer.Serialize(user);
 
         IDatabase db = muxer.GetDatabase();
-        string key = $"user:{userName}";
+        string key = Constants.GetUserKey(userName);
 
-        // Check if user already exists in set
+        // Check if user already exists
         var val = await db.StringGetAsync(key);
         if (val.IsNull)
         {

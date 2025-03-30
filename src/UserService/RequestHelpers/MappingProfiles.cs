@@ -10,8 +10,9 @@ public class MappingProfiles : Profile
     {
         // User mappings
         CreateMap<User, UserDto>();
+        CreateMap<User, UserCreated>();
         CreateMap<UserDto, User>();
-        CreateMap<UserSyncLastLoginDto, User>();
+        CreateMap<UserSyncDto, User>();
         CreateMap<UserDto, UserCreated>();
         CreateMap<UserDto, UserValues>();
 

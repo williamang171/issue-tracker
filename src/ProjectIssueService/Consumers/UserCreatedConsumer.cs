@@ -14,7 +14,7 @@ public class UserCreatedConsumer(ApplicationDbContext dbContext, IMapper mapper)
 {
     public async Task Consume(ConsumeContext<UserCreated> context)
     {
-        Console.WriteLine("--> Consuming User Created: " + context.Message.Id);
+        Console.WriteLine("--> Consuming User Created: " + context.MessageId);
 
         // For Debugging
         var messageJsonString = JsonSerializer.Serialize(context.Message, new JsonSerializerOptions { WriteIndented = true });
@@ -25,6 +25,7 @@ public class UserCreatedConsumer(ApplicationDbContext dbContext, IMapper mapper)
         var lastLoginTime = message.LastLoginTime;
         var roleCode = message.RoleCode;
         var isActive = message.IsActive;
+        var version = message.Version;
 
         var role = await dbContext.Roles.FirstOrDefaultAsync(x => x.Code == roleCode);
 
@@ -34,12 +35,13 @@ public class UserCreatedConsumer(ApplicationDbContext dbContext, IMapper mapper)
             LastLoginTime = lastLoginTime,
             RoleId = role?.Id,
             IsActive = isActive,
+            Version = version,
         };
         var user = mapper.Map<User>(userDto);
         dbContext.Users.Add(user);
 
         await dbContext.SaveChangesAsync();
 
-        Console.WriteLine("--> Consumed User Created: " + context.Message.Id);
+        Console.WriteLine("--> Consumed User Created: " + context.MessageId);
     }
 }

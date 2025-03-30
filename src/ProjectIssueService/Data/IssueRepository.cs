@@ -37,6 +37,13 @@ public class IssueRepository(ApplicationDbContext context, IMapper mapper) : IIs
         return await query.ProjectTo<IssueDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
+    public async Task<List<Issue>> GetIssueEntitiesAssignedToUser(string userName)
+    {
+        var query = _context.Issues.AsQueryable();
+        query = query.Where(t => t.Assignee == userName);
+        return await query.ToListAsync();
+    }
+
     public async Task<PagedList<IssueDto>> GetIssuesPaginatedAsync(IssueParams parameters, string? projectAssignee)
     {
         var query = _context.Issues.AsQueryable();

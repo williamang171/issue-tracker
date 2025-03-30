@@ -28,16 +28,19 @@ public class DbInitializer
                     Name = "Admin",
                     Code = "Admin",
                     CreatedBy = "System",
+                    Version = Guid.NewGuid(),
                 },
                 new() {
                     Name = "Member",
                     Code = "Member",
                     CreatedBy = "System",
+                    Version = Guid.NewGuid(),
                 },
                 new() {
                     Name = "Viewer",
                     Code = "Viewer",
                     CreatedBy = "System",
+                    Version = Guid.NewGuid(),
                 },
             };
 

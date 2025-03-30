@@ -32,14 +32,9 @@ builder.Services.AddMassTransit(x =>
 
         cfg.ConfigureEndpoints(context);
 
-        // Additional configuration for retries
         cfg.UseMessageRetry(r =>
         {
-            r.Exponential(5,                   // Max retry attempts
-                TimeSpan.FromMilliseconds(100), // Initial delay
-                TimeSpan.FromSeconds(10),       // Maximum delay
-                TimeSpan.FromSeconds(2)         // Delay multiplier
-             );
+            r.Interval(retryCount: 5, interval: TimeSpan.FromSeconds(5));
         });
     });
 });
