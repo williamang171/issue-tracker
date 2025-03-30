@@ -53,6 +53,12 @@ namespace UserService.Controllers
                 return NotFound();
             }
 
+            // Root user cannot be updated
+            if (user.IsRoot)
+            {
+                return Forbid();
+            }
+
             var roleId = dto.RoleId;
             string? roleCode = null;
             if (roleId.HasValue)
@@ -120,7 +126,8 @@ namespace UserService.Controllers
                     RoleId = viewerRole?.Id,
                     RoleCode = viewerRole?.Code,
                     IsActive = true,
-                    Version = Guid.NewGuid()
+                    Version = Guid.NewGuid(),
+                    IsRoot = currentUsername == "root"
                 };
                 var newUser = _mapper.Map<User>(newUserDto);
                 _userRepo.AddUser(newUser);
@@ -138,7 +145,7 @@ namespace UserService.Controllers
         // Return specific role for reserved usernames
         private async Task<Role?> GetDefaultRoleForUserName(string userName)
         {
-            List<string> userList = ["alice", "bob"];
+            List<string> userList = ["alice", "bob", "root"];
             if (userList.Contains(userName))
             {
                 var adminRole = await _roleRepo.GetRoleEntityByCode("Admin");
