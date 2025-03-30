@@ -16,4 +16,5 @@ public class User : BaseEntity
     public Guid? RoleId { get; set; }
     public Role? Role { get; set; }
     public bool IsActive { get; set; }
+    public bool IsRoot { get; set; }
 }

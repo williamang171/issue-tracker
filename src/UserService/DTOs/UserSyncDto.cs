@@ -10,4 +10,5 @@ public class UserSyncDto
     public string? RoleCode { get; set; }
     public bool IsActive { get; set; }
     public Guid Version { get; set; }
+    public bool IsRoot { get; set; }
 }
