@@ -174,6 +174,7 @@ export const UsersList = ({ projectId }: { projectId: BaseKey }) => {
                     />
                 </Table>
             </List>
+            {/* TODO: Hide this if user is not an admin */}
             <ModalAddUsersToProject
                 createFormLoading={createFormLoading}
                 createFormProps={createFormProps}
