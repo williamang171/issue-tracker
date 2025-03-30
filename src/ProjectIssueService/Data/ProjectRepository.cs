@@ -42,9 +42,15 @@ public class ProjectRepository(ApplicationDbContext context, IMapper mapper) : I
         return await query.ProjectTo<ProjectDto>(mapper.ConfigurationProvider).ToListAsync();
     }
 
-    public async Task<List<ProjectForSelectDto>> GetProjectsForSelectAsync()
+    public async Task<List<ProjectForSelectDto>> GetProjectsForSelectAsync(string? projectAssignee)
     {
         var query = context.Projects.AsQueryable();
+
+        if (projectAssignee != null)
+        {
+            query = query.Where(x => x.ProjectAssignments.Any(pa => pa.UserName == projectAssignee));
+        }
+
         return await query.ProjectTo<ProjectForSelectDto>(mapper.ConfigurationProvider).ToListAsync();
     }
 

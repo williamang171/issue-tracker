@@ -55,11 +55,16 @@ public class ProjectsController(
         return project;
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [HttpGet("all")]
     public async Task<ActionResult<List<ProjectForSelectDto>>> GetProjectsAll()
     {
-        var response = await repo.GetProjectsForSelectAsync();
+        // Return empty list if userName not found
+        var userName = HttpContext.GetCurrentUserName();
+        if (string.IsNullOrEmpty(userName)) return Ok(Array.Empty<string>());
+
+        var isAdmin = HttpContext.CurrentUserRoleIsAdmin();
+        var response = isAdmin ? await repo.GetProjectsForSelectAsync(null) : await repo.GetProjectsForSelectAsync(userName);
         return response;
     }
 
