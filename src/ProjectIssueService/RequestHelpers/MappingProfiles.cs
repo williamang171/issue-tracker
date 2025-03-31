@@ -45,5 +45,9 @@ public class MappingProfiles : Profile
         CreateMap<Comment, CommentDto>();
         CreateMap<CommentDto, Comment>();
         CreateMap<CommentCreateDto, Comment>();
+
+        // Attachment mappings
+        CreateMap<Attachment, AttachmentDto>();
+        CreateMap<AttachmentCreateDto, Attachment>();
     }
 }
