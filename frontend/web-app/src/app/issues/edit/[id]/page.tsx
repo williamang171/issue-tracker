@@ -5,9 +5,10 @@ import { ISSUE_STATUS_ARRAY } from '@app/constants/issue-status';
 import { ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
 import { mapToSelectItemObject } from '@app/utils/uitils-select';
 import { Edit, useForm, useSelect } from '@refinedev/antd';
-import { Form, Input, Select } from 'antd';
+import { Col, Form, Input, Row, Select } from 'antd';
 import IssueFormItem from './IssueFormItem';
 import { CommentList, Comments } from '@components/comment/comments';
+import { AttachmentList } from '@components/attachment/list';
 
 export default function IssueEdit() {
   const { formProps, saveButtonProps, query: queryResult } = useForm({});
@@ -16,6 +17,7 @@ export default function IssueEdit() {
     resource: 'projects/all',
     optionLabel: 'name',
   });
+  const id = queryResult?.data?.data.id;
 
   return (
     <div>
@@ -102,7 +104,16 @@ export default function IssueEdit() {
         </Form>
       </Edit>
       <div style={{ marginBottom: '24px' }} />
-      <Comments />
+      <Row gutter={[24, 24]}>
+        <Col xs={24} sm={24} md={12}>
+          <Comments />
+
+        </Col>
+        <Col xs={24} sm={24} md={12}>
+          <AttachmentList />
+
+        </Col>
+      </Row>
     </div>
   );
 }

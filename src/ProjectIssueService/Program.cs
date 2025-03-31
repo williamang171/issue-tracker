@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using ProjectIssueService.AuthorizationHandler;
 using ProjectIssueService.Middlewares;
 using ProjectIssueService.Services;
+using dotenv.net;
+
+DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,7 +64,9 @@ builder.Services.AddScoped<IIssueRepository, IssueRepository>();
 builder.Services.AddScoped<IProjectAssignmentRepository, ProjectAssignmentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
 builder.Services.AddScoped<IProjectAssignmentServices, ProjectAssignmentServices>();
+builder.Services.AddScoped<IFileUploadService, CloudinaryFileUploadService>();
 builder.Services.AddSingleton<IAuthorizationHandler, CustomRoleHandler>();
 
 var app = builder.Build();
