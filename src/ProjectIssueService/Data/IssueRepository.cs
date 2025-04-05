@@ -68,26 +68,28 @@ public class IssueRepository(ApplicationDbContext context, IMapper mapper) : IIs
         {
             query = query.Where(s => s.ProjectId.Equals(parameters.ProjectId.Value));
         }
+        if (!string.IsNullOrEmpty(parameters.Assignee))
+        {
+            query = query.Where(s => !string.IsNullOrEmpty(s.Assignee) && s.Assignee.Equals(parameters.Assignee));
+        }
         if (projectAssignee != null)
         {
             query = query.Where(x => x.Project.ProjectAssignments.Any(pa => pa.UserName == projectAssignee));
         }
 
-        switch (parameters._sort)
+        bool isAscending = parameters._order.Equals("ASC", StringComparison.CurrentCultureIgnoreCase);
+        query = parameters._sort switch
         {
-            case "name":
-                if (parameters._order.ToUpper().Equals("ASC"))
-                {
-                    query = query.OrderBy(s => s.Name);
-                }
-                else if (parameters._order.ToUpper().Equals("DESC"))
-                {
-                    query = query.OrderByDescending(s => s.Name);
-                }
-                break;
-            default:
-                break;
-        }
+            "name" => isAscending
+                ? query.OrderBy(s => s.Name)
+                : query.OrderByDescending(s => s.Name),
+
+            "createdTime" => isAscending
+                ? query.OrderBy(s => s.CreatedTime)
+                : query.OrderByDescending(s => s.CreatedTime),
+
+            _ => query // Default case returns query unchanged
+        };
 
         return await PagedList<IssueDto>.CreateAsync
             (query.ProjectTo<IssueDto>(_mapper.ConfigurationProvider).AsNoTracking(),

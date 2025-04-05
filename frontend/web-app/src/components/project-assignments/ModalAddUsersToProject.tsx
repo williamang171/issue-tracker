@@ -31,8 +31,8 @@ export function ModalAddUsersToProject({
         optionValue: 'userName',
         filters: [
             {
-                field: 'projectId',
-                value: projectId,
+                field: 'pagination',
+                value: false,
                 operator: 'eq'
             }
         ]

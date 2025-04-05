@@ -6,10 +6,10 @@ export const RESOLVED = 2;
 export const CLOSED = 3;
 
 export const ISSUE_STATUS = {
-    [OPEN]: createConstantObject(OPEN, 'Open', '#0088FE'),
-    [IN_PROGRESS]: createConstantObject(IN_PROGRESS, 'In Progress', '#FFBB28'),
-    [RESOLVED]: createConstantObject(RESOLVED, 'Resolved', '#00C49F'),
-    [CLOSED]: createConstantObject(CLOSED, 'Closed', '#27ae60'),
+    [OPEN]: createConstantObject(OPEN, 'Open', '#2196F3'),
+    [IN_PROGRESS]: createConstantObject(IN_PROGRESS, 'In Progress', '#FFC107'),
+    [RESOLVED]: createConstantObject(RESOLVED, 'Resolved', '#8BC34A'),
+    [CLOSED]: createConstantObject(CLOSED, 'Closed', '#4CAF50'),
 } as const;
 
 export type Status = typeof ISSUE_STATUS[keyof typeof ISSUE_STATUS];

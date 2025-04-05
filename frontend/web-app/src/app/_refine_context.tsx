@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { useNotificationProvider } from '@refinedev/antd';
 import { type AuthBindings, Refine } from '@refinedev/core';
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar';
@@ -11,6 +11,15 @@ import { dataProvider } from '@providers/data-provider/data-provider.client';
 import '@refinedev/antd/dist/reset.css';
 import { axiosInstance } from './utils/axios-instance';
 import { usePathname } from 'next/navigation';
+import {
+  AuditOutlined,
+  ProjectOutlined,
+  ReconciliationOutlined,
+  TeamOutlined,
+  UnorderedListOutlined,
+} from '@ant-design/icons';
+import HomePage from '@components/home';
+import Loading from '@components/loading/Loading';
 
 type RefineContextProps = {
   defaultMode?: string;
@@ -52,7 +61,11 @@ const App = async ({
   );
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <Loading />;
+  }
+
+  if (status === 'unauthenticated') {
+    return <HomePage />;
   }
 
   const authProvider: AuthBindings = {
@@ -98,7 +111,7 @@ const App = async ({
     logout: async () => {
       signOut({
         redirect: true,
-        callbackUrl: '/login',
+        callbackUrl: '/',
       });
 
       return {
@@ -117,14 +130,8 @@ const App = async ({
       };
     },
     check: async () => {
-      if (status === 'unauthenticated') {
-        return {
-          authenticated: false,
-        };
-      }
-
       return {
-        authenticated: true,
+        authenticated: status === 'authenticated',
       };
     },
     getPermissions: async () => {
@@ -146,34 +153,23 @@ const App = async ({
 
   return (
     <>
-      {/* <GitHubBanner /> */}
       <RefineKbarProvider>
         <ColorModeContextProvider defaultMode={defaultMode}>
           <Refine
             routerProvider={routerProvider}
             dataProvider={dataProvider}
-            // dataProvider={dataProviderServerInstance}
             notificationProvider={useNotificationProvider}
             authProvider={authProvider}
             resources={[
-              // {
-              //   name: "blog_posts",
-              //   list: "/blog-posts",
-              //   create: "/blog-posts/create",
-              //   edit: "/blog-posts/edit/:id",
-              //   show: "/blog-posts/show/:id",
-              //   meta: {
-              //     canDelete: true,
-              //   },
-              // },
               {
                 name: 'projects',
                 list: '/projects',
                 create: '/projects/create',
                 edit: '/projects/edit/:id',
                 show: '/projects/show/:id',
+
                 meta: {
-                  canDelete: true,
+                  icon: <ProjectOutlined />,
                 },
               },
               {
@@ -181,9 +177,10 @@ const App = async ({
                 list: '/issues',
                 create: '/issues/create',
                 edit: '/issues/edit/:id',
-                show: '/issues/show/:id',
+                identifier: 'issues',
                 meta: {
                   canDelete: true,
+                  icon: <UnorderedListOutlined />,
                 },
               },
               {
@@ -193,6 +190,7 @@ const App = async ({
                 edit: '/users/edit/:id',
                 show: '/users/show/:id',
                 meta: {
+                  icon: <TeamOutlined />,
                   canDelete: true,
                 },
               },
@@ -207,6 +205,7 @@ const App = async ({
             <RefineKbar />
           </Refine>
         </ColorModeContextProvider>
+
       </RefineKbarProvider>
     </>
   );

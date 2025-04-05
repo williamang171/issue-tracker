@@ -5,13 +5,13 @@ export const FEATURE_REQUEST = 1;
 export const OTHER = 2;
 
 export const ISSUE_TYPE = {
-    [BUG]: createConstantObject(BUG, 'Bug', '#f44336'),
+    [BUG]: createConstantObject(BUG, 'Bug', '#E53935'),
     [FEATURE_REQUEST]: createConstantObject(
         FEATURE_REQUEST,
         'Feature Request',
-        '#0088FE'
+        '#009688'
     ),
-    [OTHER]: createConstantObject(OTHER, 'Other', '#9b59b6'),
+    [OTHER]: createConstantObject(OTHER, 'Other', '#9C27B0'),
 } as const;
 
 export type Type = typeof ISSUE_TYPE[keyof typeof ISSUE_TYPE];

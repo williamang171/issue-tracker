@@ -4,6 +4,8 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using UserService.Entities;
+using UserService.Helpers;
+using Microsoft.AspNetCore.Mvc;
 namespace UserService.Data;
 
 public class UserRepository(ApplicationDbContext context, IMapper mapper) : IUserRepository
@@ -31,6 +33,22 @@ public class UserRepository(ApplicationDbContext context, IMapper mapper) : IUse
     {
         var query = _context.Users.AsQueryable();
         return await query.ProjectTo<UserDto>(_mapper.ConfigurationProvider).ToListAsync();
+    }
+
+    public async Task<PagedList<UserDto>> GetUsersPaginatedAsync(UserParams parameters)
+    {
+        Console.WriteLine(parameters.UserName_Like);
+        var query = _context.Users.AsQueryable();
+
+        if (!string.IsNullOrEmpty(parameters.UserName_Like))
+        {
+            query = query.Where(s => s.UserName.Contains(parameters.UserName_Like));
+        }
+
+        return await PagedList<UserDto>.CreateAsync
+            (query.ProjectTo<UserDto>(_mapper.ConfigurationProvider).AsNoTracking(),
+            parameters.PageNumber,
+            parameters.PageSize);
     }
 
     public async Task<bool> SaveChangesAsync()

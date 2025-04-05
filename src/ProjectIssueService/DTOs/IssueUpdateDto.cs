@@ -12,4 +12,5 @@ public class IssueUpdateDto
     public IssuePriority? Priority { get; set; }
     public IssueType? Type { get; set; }
     public string? Assignee { get; set; }
+    public bool? UnassignUser { get; set; }
 }

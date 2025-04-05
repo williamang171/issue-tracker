@@ -6,12 +6,26 @@ import { ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
 import { mapToSelectItemObject } from '@app/utils/uitils-select';
 import { Edit, useForm, useSelect } from '@refinedev/antd';
 import { Col, Form, Input, Row, Select } from 'antd';
-import IssueFormItem from './IssueFormItem';
-import { CommentList, Comments } from '@components/comment/comments';
+import AssigneeFormItem from './AssigneeFormItem';
+import { Comments } from '@components/comment/comments';
 import { AttachmentList } from '@components/attachment/list';
+import { BaseRecord, useMeta, useNavigation } from '@refinedev/core';
+import { RESOURCE } from '@app/constants/resource';
+import { useSearchParams } from 'next/navigation';
+import { GoBack } from '@components/goback';
 
 export default function IssueEdit() {
-  const { formProps, saveButtonProps, query: queryResult } = useForm({});
+  const searchParams = useSearchParams();
+  const from = searchParams.get('from');
+  const {
+    formProps,
+    saveButtonProps,
+    query: queryResult,
+    onFinish,
+  } = useForm({
+    redirect: from ? false : 'list',
+  });
+  const { edit } = useNavigation();
 
   const { selectProps: projectSelectProps } = useSelect({
     resource: 'projects/all',
@@ -19,10 +33,32 @@ export default function IssueEdit() {
   });
   const id = queryResult?.data?.data.id;
 
+  const handleOnFinish = async (values: BaseRecord) => {
+    await onFinish({
+      ...values,
+      unassignUser: values.assignee === undefined,
+    });
+    if (typeof from === 'string') {
+      edit(RESOURCE.projects, from);
+    }
+  };
+
   return (
     <div>
-      <Edit saveButtonProps={saveButtonProps}>
-        <Form {...formProps} layout="vertical">
+      <Edit
+        saveButtonProps={saveButtonProps}
+        breadcrumb={false}
+        headerButtons={<div />}
+        title={
+          <GoBack
+            goBackText='Issues'
+            title='Create Issue'
+            href='/issues'
+          />
+        }
+        goBack={null}
+      >
+        <Form {...formProps} layout="vertical" onFinish={handleOnFinish}>
           <Form.Item
             label={'Project'}
             name={'projectId'}
@@ -100,18 +136,16 @@ export default function IssueEdit() {
               style={{ width: 200 }}
             />
           </Form.Item>
-          <IssueFormItem projectId={queryResult?.data?.data.projectId} />
+          <AssigneeFormItem projectId={queryResult?.data?.data.projectId} />
         </Form>
       </Edit>
       <div style={{ marginBottom: '24px' }} />
       <Row gutter={[24, 24]}>
         <Col xs={24} sm={24} md={12}>
           <Comments />
-
         </Col>
         <Col xs={24} sm={24} md={12}>
           <AttachmentList />
-
         </Col>
       </Row>
     </div>
