@@ -136,7 +136,14 @@ public class IssuesController(
         issue.Status = dto.Status ?? issue.Status;
         issue.Priority = dto.Priority ?? issue.Priority;
         issue.Type = dto.Type ?? issue.Type;
-        issue.Assignee = dto.Assignee ?? issue.Assignee;
+        if (dto.UnassignUser.HasValue && dto.UnassignUser == true)
+        {
+            issue.Assignee = null;
+        }
+        else
+        {
+            issue.Assignee = dto.Assignee ?? issue.Assignee;
+        }
         issue.Version = newVersion;
         var newIssue = _mapper.Map<IssueDto>(issue);
 

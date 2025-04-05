@@ -4,6 +4,7 @@ import {
   DeleteButton,
   EditButton,
   FilterDropdown,
+  getDefaultSortOrder,
   List,
   ShowButton,
   useTable,
@@ -12,10 +13,11 @@ import { getDefaultFilter, type BaseRecord } from '@refinedev/core';
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, InputRef, Space, Table, theme } from 'antd';
 import { useRef } from 'react';
+import { formatTimestamp } from '@app/utils/utils-dayjs';
 
 export default function ProjectList() {
   const searchInput = useRef<InputRef>(null);
-  const { tableProps, filters } = useTable({
+  const { tableProps, filters, sorters } = useTable({
     syncWithLocation: true,
     filters: {
       initial: [
@@ -23,6 +25,14 @@ export default function ProjectList() {
           field: 'name',
           operator: 'contains',
           value: '',
+        },
+      ],
+    },
+    sorters: {
+      initial: [
+        {
+          field: 'createdTime',
+          order: 'desc',
         },
       ],
     },
@@ -56,16 +66,28 @@ export default function ProjectList() {
               }
             },
           }}
+
         />
         <Table.Column dataIndex="description" title={'Description'} />
+        <Table.Column
+          dataIndex="createdTime"
+          title="Created At"
+          render={(value) => {
+            if (!value) return '-';
+            return <div>{formatTimestamp(value)}</div>;
+          }}
+          sorter
+          defaultSortOrder={getDefaultSortOrder('createdTime', sorters)}
+        />
         <Table.Column
           title={'Actions'}
           dataIndex="actions"
           render={(_, record: BaseRecord) => (
             <Space>
-              <EditButton hideText size="small" recordItemId={record.id} />
-              <ShowButton hideText size="small" recordItemId={record.id} />
-              <DeleteButton hideText size="small" recordItemId={record.id} />
+              <EditButton size="small" recordItemId={record.id} icon={null} type='link'>
+                Details
+              </EditButton>
+              <DeleteButton size="small" recordItemId={record.id} icon={null} type='link' />
             </Space>
           )}
         />

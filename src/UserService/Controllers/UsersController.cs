@@ -23,7 +23,6 @@ namespace UserService.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IMapper _mapper = mapper;
 
-        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<UserDto>>> GetUsers()
         {
@@ -31,7 +30,6 @@ namespace UserService.Controllers
             return response;
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpGet("{username}")]
         public async Task<ActionResult<UserDto>> GetUserByUserName(string username)
         {
@@ -76,6 +74,7 @@ namespace UserService.Controllers
             var oldVersion = oldUserDto.Version;
 
             user.RoleId = dto.RoleId ?? user.RoleId;
+            user.IsActive = dto.IsActive ?? user.IsActive;
             user.Version = newVersion;
 
             var newUserDto = _mapper.Map<UserDto>(user);

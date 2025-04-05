@@ -6,12 +6,13 @@ import { ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
 import { mapToSelectItemObject } from '@app/utils/uitils-select';
 import { Edit, useForm, useSelect } from '@refinedev/antd';
 import { Col, Form, Input, Row, Select } from 'antd';
-import IssueFormItem from './IssueFormItem';
+import AssigneeFormItem from './AssigneeFormItem';
 import { CommentList, Comments } from '@components/comment/comments';
 import { AttachmentList } from '@components/attachment/list';
+import { BaseRecord } from '@refinedev/core';
 
 export default function IssueEdit() {
-  const { formProps, saveButtonProps, query: queryResult } = useForm({});
+  const { formProps, saveButtonProps, query: queryResult, onFinish } = useForm({});
 
   const { selectProps: projectSelectProps } = useSelect({
     resource: 'projects/all',
@@ -19,10 +20,17 @@ export default function IssueEdit() {
   });
   const id = queryResult?.data?.data.id;
 
+  const handleOnFinish = (values: BaseRecord) => {
+    onFinish({
+      ...values,
+      unassignUser: values.assignee === undefined
+    });
+  };
+
   return (
     <div>
-      <Edit saveButtonProps={saveButtonProps}>
-        <Form {...formProps} layout="vertical">
+      <Edit saveButtonProps={saveButtonProps} title={'Edit Issue'}>
+        <Form {...formProps} layout="vertical" onFinish={handleOnFinish} >
           <Form.Item
             label={'Project'}
             name={'projectId'}
@@ -100,7 +108,7 @@ export default function IssueEdit() {
               style={{ width: 200 }}
             />
           </Form.Item>
-          <IssueFormItem projectId={queryResult?.data?.data.projectId} />
+          <AssigneeFormItem projectId={queryResult?.data?.data.projectId} />
         </Form>
       </Edit>
       <div style={{ marginBottom: '24px' }} />

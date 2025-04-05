@@ -4,7 +4,7 @@ import { Form, Select } from "antd";
 import { FormInstance } from "antd/lib";
 import { useEffect } from "react";
 
-export default function IssueFormItem({ form }: { form: FormInstance<{ projectId: string, assignee: string }> }) {
+export default function AssigneeFormItem({ form }: { form: FormInstance<{ projectId: string, assignee: string }> }) {
     const projectId = Form.useWatch('projectId', form);
     const assignee = Form.useWatch('assignee', form);
 
@@ -43,6 +43,7 @@ export default function IssueFormItem({ form }: { form: FormInstance<{ projectId
             <Select
                 {...assigneeSelectProps}
                 style={{ width: 200 }}
+                allowClear
             />
         </Form.Item>
     )

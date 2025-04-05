@@ -1,7 +1,7 @@
 "use client";
 
 import { Edit, useForm, useSelect, } from "@refinedev/antd";
-import { Form, Input, Select } from "antd";
+import { Form, Input, Select, Switch } from "antd";
 
 export default function UserEdit() {
     const { formProps, saveButtonProps } = useForm({});
@@ -14,7 +14,7 @@ export default function UserEdit() {
 
     return (
         <div>
-            <Edit saveButtonProps={saveButtonProps} >
+            <Edit saveButtonProps={saveButtonProps}  >
                 <Form {...formProps} layout="vertical">
                     <Form.Item
                         label={"UserName"}
@@ -37,6 +37,12 @@ export default function UserEdit() {
                         ]}
                     >
                         <Select {...roleSelectProps} />
+                    </Form.Item>
+                    <Form.Item
+                        label={'Is Active'}
+                        name={'isActive'}
+                    >
+                        <Switch />
                     </Form.Item>
 
                 </Form>

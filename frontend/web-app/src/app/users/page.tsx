@@ -80,9 +80,11 @@ export default function UserList() {
                     dataIndex="actions"
                     render={(_, record: BaseRecord) => (
                         <Space>
-                            <EditButton hideText size="small" recordItemId={record.userName} />
-                            <ShowButton hideText size="small" recordItemId={record.id} />
-                            <DeleteButton hideText size="small" recordItemId={record.id} />
+
+                            <EditButton size="small" recordItemId={record.userName} icon={null} type='link'>
+                                Details
+                            </EditButton>
+                            <DeleteButton size="small" recordItemId={record.id} icon={null} type='link' />
                         </Space>
                     )}
                 />

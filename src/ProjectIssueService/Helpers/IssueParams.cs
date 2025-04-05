@@ -10,4 +10,5 @@ public class IssueParams : PaginationParams
     public IssuePriority? Priority { get; set; }
     public IssueType? Type { get; set; }
     public Guid? ProjectId { get; set; }
+    public string? Assignee { get; set; }
 }

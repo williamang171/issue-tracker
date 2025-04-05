@@ -11,6 +11,8 @@ import { dataProvider } from '@providers/data-provider/data-provider.client';
 import '@refinedev/antd/dist/reset.css';
 import { axiosInstance } from './utils/axios-instance';
 import { usePathname } from 'next/navigation';
+import { AuditOutlined, ProjectOutlined, ReconciliationOutlined, TeamOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import HomePage from '@components/home';
 
 type RefineContextProps = {
   defaultMode?: string;
@@ -53,6 +55,10 @@ const App = async ({
 
   if (status === 'loading') {
     return <div>Loading...</div>;
+  }
+
+  if (status === 'unauthenticated') {
+    return <HomePage />
   }
 
   const authProvider: AuthBindings = {
@@ -98,7 +104,7 @@ const App = async ({
     logout: async () => {
       signOut({
         redirect: true,
-        callbackUrl: '/login',
+        callbackUrl: '/',
       });
 
       return {
@@ -117,14 +123,8 @@ const App = async ({
       };
     },
     check: async () => {
-      if (status === 'unauthenticated') {
-        return {
-          authenticated: false,
-        };
-      }
-
       return {
-        authenticated: true,
+        authenticated: status === 'authenticated',
       };
     },
     getPermissions: async () => {
@@ -146,26 +146,14 @@ const App = async ({
 
   return (
     <>
-      {/* <GitHubBanner /> */}
       <RefineKbarProvider>
         <ColorModeContextProvider defaultMode={defaultMode}>
           <Refine
             routerProvider={routerProvider}
             dataProvider={dataProvider}
-            // dataProvider={dataProviderServerInstance}
             notificationProvider={useNotificationProvider}
             authProvider={authProvider}
             resources={[
-              // {
-              //   name: "blog_posts",
-              //   list: "/blog-posts",
-              //   create: "/blog-posts/create",
-              //   edit: "/blog-posts/edit/:id",
-              //   show: "/blog-posts/show/:id",
-              //   meta: {
-              //     canDelete: true,
-              //   },
-              // },
               {
                 name: 'projects',
                 list: '/projects',
@@ -173,17 +161,40 @@ const App = async ({
                 edit: '/projects/edit/:id',
                 show: '/projects/show/:id',
                 meta: {
-                  canDelete: true,
+                  icon: <ProjectOutlined />,
                 },
+              },
+              {
+                name: "IssuesRoot",
+                meta: {
+                  label: "Issues",
+                },
+                icon: <ReconciliationOutlined />
               },
               {
                 name: 'issues',
                 list: '/issues',
                 create: '/issues/create',
                 edit: '/issues/edit/:id',
-                show: '/issues/show/:id',
+                identifier: 'issues',
                 meta: {
                   canDelete: true,
+                  label: 'All Issues',
+                  parent: "IssuesRoot",
+                  icon: <UnorderedListOutlined />
+                },
+              },
+              {
+                name: 'issues',
+                list: '/issues/self',
+                create: '/issues/create',
+                edit: '/issues/edit/:id',
+                identifier: 'issues-self',
+                meta: {
+                  canDelete: true,
+                  label: 'My Issues',
+                  parent: "IssuesRoot",
+                  icon: <AuditOutlined />
                 },
               },
               {
@@ -193,6 +204,7 @@ const App = async ({
                 edit: '/users/edit/:id',
                 show: '/users/show/:id',
                 meta: {
+                  icon: <TeamOutlined />,
                   canDelete: true,
                 },
               },

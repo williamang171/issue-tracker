@@ -6,9 +6,7 @@ import { ISSUE_STATUS_ARRAY } from '@app/constants/issue-status';
 import { ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
 import { mapToSelectItemObject } from '@app/utils/uitils-select';
 import { ISSUE_PRIORITY_ARRAY } from '@app/constants/issue-priority';
-import IssueFormItem from './IssueFormItem';
-// import { useRouter } from 'next/navigation';
-// import { useRouter } from 'next/router';
+import AssigneeFormItem from './AssigneeFormItem';
 import { useRouter } from 'next/compat/router';
 import { useBack } from '@refinedev/core';
 
@@ -101,7 +99,7 @@ export default function IssueCreate() {
             style={{ width: 200 }}
           />
         </Form.Item>
-        <IssueFormItem form={form} />
+        <AssigneeFormItem form={form} />
       </Form>
     </Create>
   );

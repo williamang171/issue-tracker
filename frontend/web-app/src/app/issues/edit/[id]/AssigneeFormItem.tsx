@@ -1,7 +1,7 @@
 import { useSelect } from '@refinedev/antd';
 import { Form, Select } from 'antd';
 
-export default function IssueFormItem({ projectId }: { projectId: string }) {
+export default function AssigneeFormItem({ projectId }: { projectId: string }) {
   const { selectProps: assigneeSelectProps } = useSelect({
     resource: 'projectAssignments/all',
     optionLabel: 'userName',
@@ -17,7 +17,7 @@ export default function IssueFormItem({ projectId }: { projectId: string }) {
 
   return (
     <Form.Item label={'Assignee'} name={['assignee']}>
-      <Select {...assigneeSelectProps} style={{ width: 200 }} />
+      <Select {...assigneeSelectProps} style={{ width: 200 }} allowClear />
     </Form.Item>
   );
 }

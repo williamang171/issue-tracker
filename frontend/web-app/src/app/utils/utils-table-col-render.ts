@@ -8,3 +8,16 @@ export const renderEnumFieldLabel =
         }
         return value;
     }
+
+export const getEnumFieldColor =
+    (value: number, enumMap: { [x: number]: { color: string | undefined } }) => {
+        if (value in enumMap) {
+            return enumMap[value].color;
+        }
+        return undefined;
+    }
+
+export const getEnumFieldTagColor =
+    (value: number, enumMap: { [x: number]: { color: string | undefined } }) => {
+        return getEnumFieldColor(value, enumMap) || 'default';
+    }
