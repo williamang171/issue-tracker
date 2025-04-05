@@ -17,6 +17,7 @@ namespace ProjectIssueService.Controllers;
 [Route("api/[controller]")]
 public class ProjectsController(
     IProjectRepository repo,
+    IProjectAssignmentRepository projectAssignmentRepo,
     IMapper mapper,
     IPublishEndpoint publishEndpoint,
     IProjectAssignmentServices projectAssignmentServices
@@ -83,6 +84,27 @@ public class ProjectsController(
         if (await repo.SaveChangesAsync())
         {
             var projectDto = await repo.GetProjectByIdAsync(newProject.Id);
+
+            var curUserName = HttpContext.GetCurrentUserName();
+            if (curUserName != null)
+            {
+                var projectAssignment = mapper.Map<ProjectAssignment>(new ProjectAssignmentCreateDto()
+                {
+                    UserName = curUserName
+                });
+                projectAssignment.Version = Guid.NewGuid();
+                projectAssignment.ProjectId = newProject.Id;
+                projectAssignmentRepo.AddProjectAssignment(projectAssignment);
+                var toPublish = new ProjectAssignmentCreated()
+                {
+                    ProjectId = project.Id,
+                    UserName = curUserName,
+                    Version = projectAssignment.Version,
+                };
+                await publishEndpoint.Publish(toPublish);
+                await projectAssignmentRepo.SaveChangesAsync();
+            }
+
             return CreatedAtAction(
                 nameof(GetProjectById),
                 new { id = newProject.Id },

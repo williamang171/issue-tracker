@@ -9,22 +9,17 @@ import { ISSUE_TYPE, ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
 import { PlusSquareOutlined, SearchOutlined } from '@ant-design/icons';
 import { renderEnumFieldLabel } from '@app/utils/utils-table-col-render';
 import {
-  CreateButton,
   DeleteButton,
-  EditButton,
   FilterDropdown,
   getDefaultSortOrder,
   List,
-  ShowButton,
   useSelect,
   useTable,
 } from '@refinedev/antd';
 import {
   BaseKey,
-  CrudFilter,
   CrudFilters,
   getDefaultFilter,
-  useNavigation,
   type BaseRecord,
 } from '@refinedev/core';
 import { Button, Input, InputRef, Space, Table, theme } from 'antd';
@@ -34,21 +29,12 @@ import { formatTimestamp } from '@app/utils/utils-dayjs';
 import Link from 'next/link';
 
 export default function IssueList({
-  assignee,
   projectId,
 }: {
-  assignee?: string | null;
   projectId?: BaseKey;
 }) {
   const permanentFilters: CrudFilters = useMemo(() => {
     const filters: CrudFilters = [];
-    if (assignee) {
-      filters.push({
-        field: 'assignee',
-        operator: 'eq',
-        value: assignee,
-      });
-    }
     if (projectId) {
       filters.push({
         field: 'projectId',
@@ -57,7 +43,7 @@ export default function IssueList({
       });
     }
     return filters;
-  }, [assignee, projectId]);
+  }, [projectId]);
 
   const { tableProps, filters, sorters } = useTable({
     syncWithLocation: projectId ? false : true,
@@ -82,7 +68,6 @@ export default function IssueList({
     },
   });
 
-  const { create } = useNavigation();
   const { token } = theme.useToken();
   const { query: queryResult } = useSelect({
     resource: RESOURCE.projects,
@@ -95,18 +80,18 @@ export default function IssueList({
       : RESOURCE.users,
     optionLabel: 'userName',
     optionValue: 'userName',
+    filters: projectId ? [] : [
+      {
+        field: 'pagination',
+        operator: 'eq',
+        value: false,
+      }
+    ]
   });
-  // const { query: assignedUsersQueryResult } = useSelect({
-  //   resource: `${RESOURCE.projectAssignments}/all?projectId=${projectId}`,
-  //   optionLabel: 'userName',
-  //   optionValue: 'userName',
-  // });
   const searchInput = useRef<InputRef>(null);
   const projects = queryResult?.data?.data || [];
   const users = usersQueryResult?.data?.data || [];
-  // const assignedUsers = assignedUsersQueryResult?.data?.data || [];
-  // const finalUsers = projectId ? assignedUsers : users;
-  // <Link href={`/issues/edit/${record.id}?from=${projectId}`}>Details</Link>;
+
   return (
     <List
       resource="issues"
@@ -160,7 +145,7 @@ export default function IssueList({
               );
               return found?.name;
             }}
-            defaultFilteredValue={getDefaultFilter('projectId', filters, 'eq')}
+            defaultFilteredValue={getDefaultFilter('projectId', filters, 'in')}
             filterMultiple={false}
             filters={projects.map((item) => {
               return {
@@ -177,7 +162,7 @@ export default function IssueList({
           render={(value, record) => {
             return renderEnumFieldLabel(value, record, 'status', ISSUE_STATUS);
           }}
-          defaultFilteredValue={getDefaultFilter('status', filters, 'eq')}
+          defaultFilteredValue={getDefaultFilter('status', filters, 'in')}
           filters={ISSUE_STATUS_ARRAY.map((item) => {
             return {
               text: item.label,
@@ -197,7 +182,7 @@ export default function IssueList({
               ISSUE_PRIORITY
             );
           }}
-          defaultFilteredValue={getDefaultFilter('priority', filters, 'eq')}
+          defaultFilteredValue={getDefaultFilter('priority', filters, 'in')}
           filters={ISSUE_PRIORITY_ARRAY.map((item) => {
             return {
               text: item.label,
@@ -212,7 +197,7 @@ export default function IssueList({
           render={(value, record) => {
             return renderEnumFieldLabel(value, record, 'type', ISSUE_TYPE);
           }}
-          defaultFilteredValue={getDefaultFilter('type', filters, 'eq')}
+          defaultFilteredValue={getDefaultFilter('type', filters, 'in')}
           filterMultiple={false}
           filters={ISSUE_TYPE_ARRAY.map((item) => {
             return {
@@ -228,23 +213,23 @@ export default function IssueList({
             },
           }}
         />
-        {assignee ? null : (
-          <Table.Column
-            dataIndex="assignee"
-            title={'Assignee'}
-            render={(value, record) => {
-              return record.assignee || '-';
-            }}
-            defaultFilteredValue={getDefaultFilter('assignee', filters, 'eq')}
-            filterMultiple={false}
-            filters={users.map((item) => {
-              return {
-                text: item.userName,
-                value: item.userName,
-              };
-            })}
-          />
-        )}
+
+        <Table.Column
+          dataIndex="assignee"
+          title={'Assignee'}
+          render={(value, record) => {
+            return record.assignee || '-';
+          }}
+          defaultFilteredValue={getDefaultFilter('assignee', filters, 'in')}
+          filterMultiple={false}
+          filters={users.map((item) => {
+            return {
+              text: item.userName,
+              value: item.userName,
+            };
+          })}
+        />
+
         <Table.Column
           dataIndex="createdTime"
           title="Created At"

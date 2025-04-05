@@ -6,6 +6,8 @@ using UserService.DTOs;
 using UserService.Entities;
 using MassTransit;
 using Contracts;
+using UserService.Helpers;
+using UserService.Extensions;
 
 namespace UserService.Controllers
 {
@@ -24,9 +26,14 @@ namespace UserService.Controllers
         private readonly IMapper _mapper = mapper;
 
         [HttpGet]
-        public async Task<ActionResult<List<UserDto>>> GetUsers()
+        public async Task<ActionResult<List<UserDto>>> GetUsers([FromQuery] UserParams parameters)
         {
-            var response = await _userRepo.GetUsersAsync();
+            if (parameters.Pagination.HasValue && parameters.Pagination == false)
+            {
+                return await _userRepo.GetUsersAsync();
+            }
+            var response = await _userRepo.GetUsersPaginatedAsync(parameters);
+            Response.AddPaginationHeader(response.TotalCount);
             return response;
         }
 

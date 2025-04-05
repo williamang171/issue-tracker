@@ -1,5 +1,6 @@
 'use client';
 
+import { GoBack } from '@components/goback';
 import { Edit, useForm, useSelect } from '@refinedev/antd';
 import { Form, Input, Select, Switch } from 'antd';
 
@@ -15,10 +16,17 @@ export default function UserEdit() {
   return (
     <div>
       <Edit
+        title={
+          <GoBack
+            goBackText='Users'
+            title='User Details'
+            href='/users'
+          />
+        }
+        goBack={null}
         saveButtonProps={saveButtonProps}
         breadcrumb={false}
         headerButtons={<div />}
-        title="User Details"
       >
         <Form {...formProps} layout="vertical">
           <Form.Item

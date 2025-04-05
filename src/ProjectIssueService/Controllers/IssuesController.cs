@@ -40,6 +40,7 @@ public class IssuesController(
         var response = isAdmin ?
             await _issueRepo.GetIssuesPaginatedAsync(parameters, null) :
             await _issueRepo.GetIssuesPaginatedAsync(parameters, userName);
+        Response.AddPaginationHeader(response.TotalCount);
         return response;
     }
 

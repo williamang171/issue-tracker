@@ -40,7 +40,7 @@ export default function UserList() {
                 <Table.Column
                     dataIndex="userName"
                     title={'UserName'}
-                    sorter
+
                     filterIcon={(filtered) => (
                         <SearchOutlined
                             style={{
@@ -48,7 +48,7 @@ export default function UserList() {
                             }}
                         />
                     )}
-                    defaultFilteredValue={getDefaultFilter('name', filters, 'contains')}
+                    defaultFilteredValue={getDefaultFilter('userName', filters, 'contains')}
                     filterDropdown={(props) => (
                         <FilterDropdown {...props}>
                             <Input placeholder={''} ref={searchInput} />
@@ -66,7 +66,7 @@ export default function UserList() {
                 <Table.Column
                     dataIndex="roleId"
                     title={'Role'}
-                    sorter
+
                     render={(roleId) => {
                         const role = roles.find((r) => r.id === roleId);
                         return (<div>

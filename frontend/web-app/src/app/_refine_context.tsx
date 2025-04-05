@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { useNotificationProvider } from '@refinedev/antd';
 import { type AuthBindings, Refine } from '@refinedev/core';
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar';
@@ -19,19 +19,11 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import HomePage from '@components/home';
-import { Spin } from 'antd';
 import Loading from '@components/loading/Loading';
 
 type RefineContextProps = {
   defaultMode?: string;
 };
-const contentStyle: React.CSSProperties = {
-  padding: 50,
-  background: 'rgba(0, 0, 0, 0.05)',
-  borderRadius: 4,
-};
-
-const content = <div style={contentStyle} />;
 
 export const RefineContext = (
   props: React.PropsWithChildren<RefineContextProps>
@@ -181,13 +173,6 @@ const App = async ({
                 },
               },
               {
-                name: 'IssuesRoot',
-                meta: {
-                  label: 'Issues',
-                },
-                icon: <ReconciliationOutlined />,
-              },
-              {
                 name: 'issues',
                 list: '/issues',
                 create: '/issues/create',
@@ -195,22 +180,7 @@ const App = async ({
                 identifier: 'issues',
                 meta: {
                   canDelete: true,
-                  label: 'All Issues',
-                  parent: 'IssuesRoot',
                   icon: <UnorderedListOutlined />,
-                },
-              },
-              {
-                name: 'issues',
-                list: '/issues/self',
-                create: '/issues/create',
-                edit: '/issues/edit/:id',
-                identifier: 'issues-self',
-                meta: {
-                  canDelete: true,
-                  label: 'My Issues',
-                  parent: 'IssuesRoot',
-                  icon: <AuditOutlined />,
                 },
               },
               {
@@ -235,6 +205,7 @@ const App = async ({
             <RefineKbar />
           </Refine>
         </ColorModeContextProvider>
+
       </RefineKbarProvider>
     </>
   );

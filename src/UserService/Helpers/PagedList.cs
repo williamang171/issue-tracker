@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace ProjectIssueService.Helpers
+namespace UserService.Helpers
 {
     public class PagedList<T> : List<T>
     {

@@ -10,10 +10,11 @@ const { Title, Paragraph } = Typography;
 
 const HomePage = () => {
     return (
-        <Layout className="layout" style={{ minHeight: '100vh' }}>
+        <Layout className="layout" style={{ minHeight: '100vh', minWidth: '460px' }}>
             <Header style={{ padding: '0 50px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div className="logo">
-                    <Typography.Title level={3} style={{ color: 'white', margin: '0' }}>
+                <div className="logo" style={{ display: 'flex', alignItems: 'center' }}>
+
+                    <Typography.Title level={4} style={{ color: 'white', margin: '0', marginLeft: '8px' }}>
                         Issue Tracker
                     </Typography.Title>
                 </div>

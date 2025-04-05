@@ -7,10 +7,15 @@ import { useGetProjectChartsData } from '@hooks/useGetProjectChartsData';
 import { Edit, useForm } from '@refinedev/antd';
 import { useMediaQuery } from 'react-responsive';
 
-import { Alert, Form, Input, Row, Col } from 'antd';
+import { Alert, Form, Input, Row, Col, Button, Divider } from 'antd';
+import Link from 'next/link';
+import { LeftOutlined } from '@ant-design/icons';
+import { GoBack } from '@components/goback';
+
 
 export default function ProjectEdit() {
   const { formProps, saveButtonProps, query: queryResult } = useForm({});
+
   const { issuePriorityCountData, issueStatusCountData, issueTypeCountData } =
     useGetProjectChartsData();
   const isDesktop = useMediaQuery({ minWidth: 768 });
@@ -24,11 +29,18 @@ export default function ProjectEdit() {
       <Row gutter={[24, 24]}>
         <Col md={10} lg={10} xl={12} sm={24} xs={24}>
           <Edit
-            title="Project Details"
+            title={
+              <GoBack
+                goBackText='Projects'
+                title='Project Details'
+                href='/projects'
+              />
+            }
             breadcrumb={false}
             saveButtonProps={saveButtonProps}
             isLoading={queryResult?.status === 'loading'}
             headerButtons={<div />}
+            goBack={null}
           >
             <Form {...formProps} layout="vertical">
               <Form.Item

@@ -12,6 +12,7 @@ import { AttachmentList } from '@components/attachment/list';
 import { BaseRecord, useMeta, useNavigation } from '@refinedev/core';
 import { RESOURCE } from '@app/constants/resource';
 import { useSearchParams } from 'next/navigation';
+import { GoBack } from '@components/goback';
 
 export default function IssueEdit() {
   const searchParams = useSearchParams();
@@ -47,8 +48,15 @@ export default function IssueEdit() {
       <Edit
         saveButtonProps={saveButtonProps}
         breadcrumb={false}
-        title={'Issue Details'}
         headerButtons={<div />}
+        title={
+          <GoBack
+            goBackText='Issues'
+            title='Create Issue'
+            href='/issues'
+          />
+        }
+        goBack={null}
       >
         <Form {...formProps} layout="vertical" onFinish={handleOnFinish}>
           <Form.Item

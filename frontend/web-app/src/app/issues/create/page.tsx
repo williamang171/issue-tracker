@@ -10,6 +10,7 @@ import AssigneeFormItem from './AssigneeFormItem';
 import { BaseRecord, useBack, useNavigation } from '@refinedev/core';
 import { useSearchParams } from 'next/navigation';
 import { RESOURCE } from '@app/constants/resource';
+import { GoBack } from '@components/goback';
 
 export default function IssueCreate() {
   const searchParams = useSearchParams();
@@ -19,8 +20,8 @@ export default function IssueCreate() {
       redirect: from ? false : 'list',
       defaultFormValues: from
         ? {
-            projectId: from,
-          }
+          projectId: from,
+        }
         : {},
     }
   );
@@ -42,7 +43,14 @@ export default function IssueCreate() {
     <Create
       saveButtonProps={saveButtonProps}
       breadcrumb={false}
-      title="Create Issue"
+      title={
+        <GoBack
+          goBackText='Issues'
+          title='Create Issue'
+          href='/issues'
+        />
+      }
+      goBack={null}
     >
       <Form {...formProps} layout="vertical" onFinish={handleOnFinish}>
         <Form.Item
