@@ -7,12 +7,24 @@ import { mapToSelectItemObject } from '@app/utils/uitils-select';
 import { Edit, useForm, useSelect } from '@refinedev/antd';
 import { Col, Form, Input, Row, Select } from 'antd';
 import AssigneeFormItem from './AssigneeFormItem';
-import { CommentList, Comments } from '@components/comment/comments';
+import { Comments } from '@components/comment/comments';
 import { AttachmentList } from '@components/attachment/list';
-import { BaseRecord } from '@refinedev/core';
+import { BaseRecord, useMeta, useNavigation } from '@refinedev/core';
+import { RESOURCE } from '@app/constants/resource';
+import { useSearchParams } from 'next/navigation';
 
 export default function IssueEdit() {
-  const { formProps, saveButtonProps, query: queryResult, onFinish } = useForm({});
+  const searchParams = useSearchParams();
+  const from = searchParams.get('from');
+  const {
+    formProps,
+    saveButtonProps,
+    query: queryResult,
+    onFinish,
+  } = useForm({
+    redirect: from ? false : 'list',
+  });
+  const { edit } = useNavigation();
 
   const { selectProps: projectSelectProps } = useSelect({
     resource: 'projects/all',
@@ -20,17 +32,25 @@ export default function IssueEdit() {
   });
   const id = queryResult?.data?.data.id;
 
-  const handleOnFinish = (values: BaseRecord) => {
-    onFinish({
+  const handleOnFinish = async (values: BaseRecord) => {
+    await onFinish({
       ...values,
-      unassignUser: values.assignee === undefined
+      unassignUser: values.assignee === undefined,
     });
+    if (typeof from === 'string') {
+      edit(RESOURCE.projects, from);
+    }
   };
 
   return (
     <div>
-      <Edit saveButtonProps={saveButtonProps} title={'Edit Issue'}>
-        <Form {...formProps} layout="vertical" onFinish={handleOnFinish} >
+      <Edit
+        saveButtonProps={saveButtonProps}
+        breadcrumb={false}
+        title={'Issue Details'}
+        headerButtons={<div />}
+      >
+        <Form {...formProps} layout="vertical" onFinish={handleOnFinish}>
           <Form.Item
             label={'Project'}
             name={'projectId'}
@@ -115,11 +135,9 @@ export default function IssueEdit() {
       <Row gutter={[24, 24]}>
         <Col xs={24} sm={24} md={12}>
           <Comments />
-
         </Col>
         <Col xs={24} sm={24} md={12}>
           <AttachmentList />
-
         </Col>
       </Row>
     </div>

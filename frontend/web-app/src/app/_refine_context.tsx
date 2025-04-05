@@ -11,12 +11,27 @@ import { dataProvider } from '@providers/data-provider/data-provider.client';
 import '@refinedev/antd/dist/reset.css';
 import { axiosInstance } from './utils/axios-instance';
 import { usePathname } from 'next/navigation';
-import { AuditOutlined, ProjectOutlined, ReconciliationOutlined, TeamOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import {
+  AuditOutlined,
+  ProjectOutlined,
+  ReconciliationOutlined,
+  TeamOutlined,
+  UnorderedListOutlined,
+} from '@ant-design/icons';
 import HomePage from '@components/home';
+import { Spin } from 'antd';
+import Loading from '@components/loading/Loading';
 
 type RefineContextProps = {
   defaultMode?: string;
 };
+const contentStyle: React.CSSProperties = {
+  padding: 50,
+  background: 'rgba(0, 0, 0, 0.05)',
+  borderRadius: 4,
+};
+
+const content = <div style={contentStyle} />;
 
 export const RefineContext = (
   props: React.PropsWithChildren<RefineContextProps>
@@ -54,11 +69,11 @@ const App = async ({
   );
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (status === 'unauthenticated') {
-    return <HomePage />
+    return <HomePage />;
   }
 
   const authProvider: AuthBindings = {
@@ -160,16 +175,17 @@ const App = async ({
                 create: '/projects/create',
                 edit: '/projects/edit/:id',
                 show: '/projects/show/:id',
+
                 meta: {
                   icon: <ProjectOutlined />,
                 },
               },
               {
-                name: "IssuesRoot",
+                name: 'IssuesRoot',
                 meta: {
-                  label: "Issues",
+                  label: 'Issues',
                 },
-                icon: <ReconciliationOutlined />
+                icon: <ReconciliationOutlined />,
               },
               {
                 name: 'issues',
@@ -180,8 +196,8 @@ const App = async ({
                 meta: {
                   canDelete: true,
                   label: 'All Issues',
-                  parent: "IssuesRoot",
-                  icon: <UnorderedListOutlined />
+                  parent: 'IssuesRoot',
+                  icon: <UnorderedListOutlined />,
                 },
               },
               {
@@ -193,8 +209,8 @@ const App = async ({
                 meta: {
                   canDelete: true,
                   label: 'My Issues',
-                  parent: "IssuesRoot",
-                  icon: <AuditOutlined />
+                  parent: 'IssuesRoot',
+                  icon: <AuditOutlined />,
                 },
               },
               {

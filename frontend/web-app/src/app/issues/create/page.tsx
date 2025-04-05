@@ -1,27 +1,50 @@
 'use client';
 
 import { Create, useForm, useSelect } from '@refinedev/antd';
-import { Form, Input, InputNumber, Select } from 'antd';
+import { Form, Input, Select } from 'antd';
 import { ISSUE_STATUS_ARRAY } from '@app/constants/issue-status';
 import { ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
 import { mapToSelectItemObject } from '@app/utils/uitils-select';
 import { ISSUE_PRIORITY_ARRAY } from '@app/constants/issue-priority';
 import AssigneeFormItem from './AssigneeFormItem';
-import { useRouter } from 'next/compat/router';
-import { useBack } from '@refinedev/core';
+import { BaseRecord, useBack, useNavigation } from '@refinedev/core';
+import { useSearchParams } from 'next/navigation';
+import { RESOURCE } from '@app/constants/resource';
 
 export default function IssueCreate() {
-  const back = useBack();
-  const { formProps, saveButtonProps, form } = useForm<any, any, any>({});
+  const searchParams = useSearchParams();
+  const from = searchParams.get('from');
+  const { formProps, saveButtonProps, form, onFinish } = useForm<any, any, any>(
+    {
+      redirect: from ? false : 'list',
+      defaultFormValues: from
+        ? {
+            projectId: from,
+          }
+        : {},
+    }
+  );
   const { selectProps: projectSelectProps } = useSelect({
     resource: 'projects/all',
     optionLabel: 'name',
     optionValue: 'id',
   });
+  const { edit } = useNavigation();
+
+  const handleOnFinish = async (values: BaseRecord) => {
+    await onFinish(values);
+    if (typeof from === 'string') {
+      edit(RESOURCE.projects, from);
+    }
+  };
 
   return (
-    <Create saveButtonProps={saveButtonProps}>
-      <Form {...formProps} layout="vertical">
+    <Create
+      saveButtonProps={saveButtonProps}
+      breadcrumb={false}
+      title="Create Issue"
+    >
+      <Form {...formProps} layout="vertical" onFinish={handleOnFinish}>
         <Form.Item
           label={'Project'}
           name={'projectId'}
