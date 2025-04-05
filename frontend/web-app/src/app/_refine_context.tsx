@@ -1,13 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { act, useEffect } from 'react';
 import { useNotificationProvider } from '@refinedev/antd';
 import { type AuthBindings, Refine } from '@refinedev/core';
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar';
 import routerProvider from '@refinedev/nextjs-router';
 import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import { ColorModeContextProvider } from '@contexts/color-mode';
-import { dataProvider } from '@providers/data-provider/data-provider.client';
+import { API_URL, dataProvider } from '@providers/data-provider/data-provider.client';
 import '@refinedev/antd/dist/reset.css';
 import { axiosInstance } from './utils/axios-instance';
 import { usePathname } from 'next/navigation';
@@ -20,6 +20,9 @@ import {
 } from '@ant-design/icons';
 import HomePage from '@components/home';
 import Loading from '@components/loading/Loading';
+
+const canAccess = { can: true };
+const cannotAccess = { can: false, reason: ' ' };
 
 type RefineContextProps = {
   defaultMode?: string;
@@ -39,7 +42,7 @@ type AppProps = {
   defaultMode?: string;
 };
 
-const App = async ({
+const App = ({
   children,
   defaultMode,
 }: React.PropsWithChildren<AppProps>) => {
@@ -59,6 +62,21 @@ const App = async ({
       return Promise.reject(error);
     }
   );
+
+  const fetchRole = async () => {
+    if (data?.accessToken) {
+      await fetch(`${API_URL}/users/getCurrentUserRole`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: `Bearer ${data?.accessToken}`
+        },
+      }).then(async (data) => {
+        const json = await data.json();
+        sessionStorage.setItem('role', json.roleCode)
+      });
+    }
+  }
 
   if (status === 'loading') {
     return <Loading />;
@@ -109,6 +127,7 @@ const App = async ({
       };
     },
     logout: async () => {
+      sessionStorage.removeItem('role');
       signOut({
         redirect: true,
         callbackUrl: '/',
@@ -160,6 +179,52 @@ const App = async ({
             dataProvider={dataProvider}
             notificationProvider={useNotificationProvider}
             authProvider={authProvider}
+            accessControlProvider={{
+              can: async ({ action, params, resource }) => {
+                let role = sessionStorage.getItem("role");
+                if (!role) {
+                  await fetchRole();
+                  role = sessionStorage.getItem("role");
+                }
+                if (role === "Admin") {
+                  return canAccess;
+                }
+                if (resource === "users") {
+                  return cannotAccess;
+                }
+
+                if (role === "Member") {
+                  if (resource === "comments") {
+                    return canAccess;
+                  }
+
+                  if (resource === "issues") {
+                    return canAccess;
+                  }
+
+                  if (resource === "attachments") {
+                    return canAccess;
+                  }
+
+                  if (resource === "projects") {
+                    if (["delete", "create"].includes(action)) {
+                      return cannotAccess;
+                    }
+
+                    return canAccess;
+                  }
+                }
+
+                if (role === "Viewer") {
+                  if (["create", "delete"].includes(action)) {
+                    return cannotAccess;
+                  }
+                  return canAccess;
+                }
+
+                return cannotAccess;
+              },
+            }}
             resources={[
               {
                 name: 'projects',

@@ -4,7 +4,6 @@ import { useParams } from 'next/navigation';
 
 import { RESOURCE } from '@app/constants/resource';
 import { useModalForm, } from '@refinedev/antd';
-// import { ModalCreate } from './modalCreate';
 import PicturesList from './picturesList';
 
 const resource = RESOURCE.attachments;

@@ -9,10 +9,11 @@ import {
     useTable,
 } from '@refinedev/antd';
 import { getDefaultFilter, useList, type BaseRecord } from '@refinedev/core';
-import { SearchOutlined } from '@ant-design/icons';
+import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Input, InputRef, Space, Table, theme } from 'antd';
 import { useRef } from 'react';
 import { RESOURCE } from '@app/constants/resource';
+import { useGetUserRole } from '@hooks/useGetUserRole';
 
 export default function UserList() {
     const searchInput = useRef<InputRef>(null);
@@ -33,6 +34,11 @@ export default function UserList() {
         resource: `${RESOURCE.roles}`,
     });
     const roles = data?.data || [];
+
+    const { isAdmin } = useGetUserRole();
+    if (!isAdmin) {
+        return null;
+    }
 
     return (
         <List canCreate={false}>
@@ -80,11 +86,7 @@ export default function UserList() {
                     dataIndex="actions"
                     render={(_, record: BaseRecord) => (
                         <Space>
-
-                            <EditButton size="small" recordItemId={record.userName} icon={null} type='link'>
-                                Details
-                            </EditButton>
-                            <DeleteButton size="small" recordItemId={record.id} icon={null} type='link' />
+                            <EditButton size="small" recordItemId={record.userName} hideText icon={<EyeOutlined />} />
                         </Space>
                     )}
                 />

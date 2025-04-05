@@ -2,6 +2,20 @@ import NextAuth, { Profile } from "next-auth"
 import { OIDCConfig } from 'next-auth/providers'
 import DuendeIDS6Provider from "next-auth/providers/duende-identity-server6"
 import axios from 'axios';
+import { API_URL } from "@providers/data-provider/data-provider.client";
+
+const fetchRole = async (accessToken: string) => {
+  await fetch(`${API_URL}/users/getCurrentUserRole`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization: `Bearer ${accessToken}`
+    },
+  }).then(async (data) => {
+    const json = await data.json();
+    return json.roleCode;
+  });
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
@@ -51,6 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (profile) {
         token.username = profile.username
       }
+      // token.roleCode = await fetchRole(token.accessToken);
       return token;
     },
     async session({ session, token, }) {

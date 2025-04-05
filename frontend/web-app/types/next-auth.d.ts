@@ -7,6 +7,7 @@ declare module "next-auth" {
       username: string
     } & DefaultSession["user"]
     accessToken: string
+    roleCode: string
   }
 
   interface Profile {

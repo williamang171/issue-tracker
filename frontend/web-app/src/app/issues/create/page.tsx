@@ -14,18 +14,19 @@ import { GoBack } from '@components/goback';
 
 export default function IssueCreate() {
   const searchParams = useSearchParams();
-  const from = searchParams.get('from');
-  const { formProps, saveButtonProps, form, onFinish } = useForm<any, any, any>(
+  const projectId = searchParams.get('projectId');
+  const projectName = searchParams.get('projectName');
+  const { formProps, saveButtonProps, form, onFinish, } = useForm<any, any, any>(
     {
-      redirect: from ? false : 'list',
-      defaultFormValues: from
+      redirect: projectId ? false : 'list',
+      defaultFormValues: projectId
         ? {
-          projectId: from,
+          projectId: projectId,
         }
         : {},
     }
   );
-  const { selectProps: projectSelectProps } = useSelect({
+  const { selectProps: projectSelectProps, query } = useSelect({
     resource: 'projects/all',
     optionLabel: 'name',
     optionValue: 'id',
@@ -34,8 +35,8 @@ export default function IssueCreate() {
 
   const handleOnFinish = async (values: BaseRecord) => {
     await onFinish(values);
-    if (typeof from === 'string') {
-      edit(RESOURCE.projects, from);
+    if (typeof projectId === 'string') {
+      edit(RESOURCE.projects, projectId);
     }
   };
 
@@ -45,9 +46,8 @@ export default function IssueCreate() {
       breadcrumb={false}
       title={
         <GoBack
-          goBackText='Issues'
           title='Create Issue'
-          href='/issues'
+          href={projectId ? `/projects/edit/${projectId}` : `/issues`}
         />
       }
       goBack={null}
@@ -62,7 +62,12 @@ export default function IssueCreate() {
             },
           ]}
         >
-          <Select {...projectSelectProps} />
+          <Select {...projectSelectProps} labelRender={(props) => {
+            if (props.label) {
+              return props.label;
+            }
+            return '';
+          }} />
         </Form.Item>
         <Form.Item
           label={'Name'}
@@ -84,7 +89,7 @@ export default function IssueCreate() {
             },
           ]}
         >
-          <Input.TextArea rows={5} />
+          <Input.TextArea rows={2} />
         </Form.Item>
         <Form.Item
           label={'Status'}
