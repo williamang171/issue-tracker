@@ -18,18 +18,14 @@ const App: React.FC = () => {
         },
         sorters: [
             {
-                field: "createdAt",
+                field: "createdTime",
                 order: "desc",
             },
         ],
         filters: [{ field: 'issueId', operator: "eq", value: params.id }],
     });
 
-    const { data: canDelete } = useCan({
-        resource: "comments",
-        action: "delete",
-        params: {},
-    });
+
 
     const renderPictures = () => {
         return (
@@ -54,7 +50,7 @@ const App: React.FC = () => {
                             description={
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <div>{item.name}</div>
-                                    <DeleteButton disabled={!canDelete} style={{ marginRight: '8px' }} resource='attachments' recordItemId={item.id} hideText size='small' />
+                                    <DeleteButton style={{ marginRight: '8px' }} resource='attachments' recordItemId={item.id} hideText size='small' />
                                 </div>
                             }
                         />

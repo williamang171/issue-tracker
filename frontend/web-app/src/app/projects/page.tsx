@@ -10,7 +10,7 @@ import {
   useTable,
 } from '@refinedev/antd';
 import { getDefaultFilter, type BaseRecord } from '@refinedev/core';
-import { SearchOutlined } from '@ant-design/icons';
+import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Input, InputRef, Space, Table, theme } from 'antd';
 import { useRef } from 'react';
 import { formatTimestamp } from '@app/utils/utils-dayjs';
@@ -84,10 +84,9 @@ export default function ProjectList() {
           dataIndex="actions"
           render={(_, record: BaseRecord) => (
             <Space>
-              <EditButton size="small" recordItemId={record.id} icon={null} type='link'>
-                Details
+              <EditButton size="small" recordItemId={record.id} hideText icon={<EyeOutlined />} >
               </EditButton>
-              <DeleteButton size="small" recordItemId={record.id} icon={null} type='link' />
+
             </Space>
           )}
         />

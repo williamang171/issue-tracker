@@ -25,6 +25,16 @@ namespace UserService.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IMapper _mapper = mapper;
 
+        [HttpGet("getCurrentUserRole")]
+        public ActionResult<CurrentUserRoleDto> GetCurrentUserRole()
+        {
+            var userRole = HttpContext.GetUserRole();
+            return new CurrentUserRoleDto()
+            {
+                RoleCode = userRole
+            };
+        }
+
         [HttpGet]
         public async Task<ActionResult<List<UserDto>>> GetUsers([FromQuery] UserParams parameters)
         {

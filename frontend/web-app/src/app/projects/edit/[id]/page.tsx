@@ -7,14 +7,15 @@ import { useGetProjectChartsData } from '@hooks/useGetProjectChartsData';
 import { Edit, useForm } from '@refinedev/antd';
 import { useMediaQuery } from 'react-responsive';
 
-import { Alert, Form, Input, Row, Col, Button, Divider } from 'antd';
-import Link from 'next/link';
-import { LeftOutlined } from '@ant-design/icons';
+import { Alert, Form, Input, Row, Col } from 'antd';
 import { GoBack } from '@components/goback';
-
+import { useGetUserRole } from '@hooks/useGetUserRole';
+import { useSession } from 'next-auth/react';
 
 export default function ProjectEdit() {
   const { formProps, saveButtonProps, query: queryResult } = useForm({});
+
+  const { isAdmin } = useGetUserRole();
 
   const { issuePriorityCountData, issueStatusCountData, issueTypeCountData } =
     useGetProjectChartsData();
@@ -31,18 +32,21 @@ export default function ProjectEdit() {
           <Edit
             title={
               <GoBack
-                goBackText='Projects'
                 title='Project Details'
                 href='/projects'
               />
             }
             breadcrumb={false}
-            saveButtonProps={saveButtonProps}
+            saveButtonProps={{
+              ...saveButtonProps,
+              disabled: !isAdmin
+            }}
             isLoading={queryResult?.status === 'loading'}
             headerButtons={<div />}
             goBack={null}
+            canDelete
           >
-            <Form {...formProps} layout="vertical">
+            <Form disabled={!isAdmin} {...formProps} layout="vertical">
               <Form.Item
                 label={'Name'}
                 name={['name']}

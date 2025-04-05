@@ -13,17 +13,20 @@ import { BaseRecord, useMeta, useNavigation } from '@refinedev/core';
 import { RESOURCE } from '@app/constants/resource';
 import { useSearchParams } from 'next/navigation';
 import { GoBack } from '@components/goback';
+import { useSession } from 'next-auth/react';
+import { useGetUserRole } from '@hooks/useGetUserRole';
 
 export default function IssueEdit() {
   const searchParams = useSearchParams();
-  const from = searchParams.get('from');
+  const projectId = searchParams.get('projectId');
+  const projectName = searchParams.get('projectName');
   const {
     formProps,
     saveButtonProps,
     query: queryResult,
     onFinish,
   } = useForm({
-    redirect: from ? false : 'list',
+    redirect: projectId ? false : 'list',
   });
   const { edit } = useNavigation();
 
@@ -32,33 +35,39 @@ export default function IssueEdit() {
     optionLabel: 'name',
   });
   const id = queryResult?.data?.data.id;
-
+  const { data } = useSession();
   const handleOnFinish = async (values: BaseRecord) => {
     await onFinish({
       ...values,
       unassignUser: values.assignee === undefined,
     });
-    if (typeof from === 'string') {
-      edit(RESOURCE.projects, from);
+    if (typeof projectId === 'string') {
+      edit(RESOURCE.projects, projectId);
     }
   };
+  const { isAdmin, isReadOnly } = useGetUserRole();
 
   return (
     <div>
       <Edit
-        saveButtonProps={saveButtonProps}
+        deleteButtonProps={{
+          disabled: !isAdmin && queryResult?.data?.data.createdBy !== data?.user.username
+        }}
+        saveButtonProps={{
+          ...saveButtonProps,
+          disabled: isReadOnly
+        }}
         breadcrumb={false}
         headerButtons={<div />}
         title={
           <GoBack
-            goBackText='Issues'
-            title='Create Issue'
-            href='/issues'
+            title='Issue Details'
+            href={projectId ? `/projects/edit/${projectId}` : `/issues`}
           />
         }
         goBack={null}
       >
-        <Form {...formProps} layout="vertical" onFinish={handleOnFinish}>
+        <Form {...formProps} layout="vertical" onFinish={handleOnFinish} disabled={isReadOnly}>
           <Form.Item
             label={'Project'}
             name={'projectId'}
@@ -68,7 +77,12 @@ export default function IssueEdit() {
               },
             ]}
           >
-            <Select {...projectSelectProps} disabled />
+            <Select {...projectSelectProps} disabled labelRender={(props) => {
+              if (props.label) {
+                return props.label;
+              }
+              return '';
+            }} />
           </Form.Item>
           <Form.Item
             label={'Name'}
@@ -90,7 +104,7 @@ export default function IssueEdit() {
               },
             ]}
           >
-            <Input.TextArea rows={5} />
+            <Input.TextArea rows={2} />
           </Form.Item>
           <Form.Item
             label={'Status'}

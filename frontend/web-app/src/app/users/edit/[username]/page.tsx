@@ -1,6 +1,7 @@
 'use client';
 
 import { GoBack } from '@components/goback';
+import { useGetUserRole } from '@hooks/useGetUserRole';
 import { Edit, useForm, useSelect } from '@refinedev/antd';
 import { Form, Input, Select, Switch } from 'antd';
 
@@ -13,12 +14,16 @@ export default function UserEdit() {
     optionValue: 'id',
   });
 
+  const { isAdmin } = useGetUserRole();
+  if (!isAdmin) {
+    return null;
+  }
+
   return (
     <div>
       <Edit
         title={
           <GoBack
-            goBackText='Users'
             title='User Details'
             href='/users'
           />

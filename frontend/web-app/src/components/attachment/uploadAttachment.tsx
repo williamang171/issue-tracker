@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation';
 import { useInvalidate } from '@refinedev/core';
 import { RESOURCE } from '@app/constants/resource';
 import { useSession } from 'next-auth/react';
+import { useGetUserRole } from '@hooks/useGetUserRole';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -30,6 +31,7 @@ const UploadAttachment: React.FC = () => {
     const { data, status } = useSession();
     const params = useParams();
     const invalidate = useInvalidate();
+    const { isReadOnly } = useGetUserRole();
     const props: UploadProps = {
         action: `${API_URL}/upload`,
         headers: {
@@ -77,7 +79,7 @@ const UploadAttachment: React.FC = () => {
     }
     return (
         <Upload {...props} beforeUpload={beforeUpload} accept="image/png, image/jpeg">
-            <Button loading={isLoading} icon={<UploadOutlined />}>Attach</Button>
+            <Button disabled={isReadOnly} loading={isLoading} icon={<UploadOutlined />}>Attach</Button>
         </Upload>
     );
 }

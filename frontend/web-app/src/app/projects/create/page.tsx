@@ -11,7 +11,6 @@ export default function ProjectCreate() {
     <Create saveButtonProps={saveButtonProps} breadcrumb={false}
       title={
         <GoBack
-          goBackText='Projects'
           title='Create Project'
           href='/projects'
         />

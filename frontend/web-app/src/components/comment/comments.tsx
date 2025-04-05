@@ -3,6 +3,7 @@ import { useParams } from 'next/navigation';
 
 import { DeleteButton, useForm } from '@refinedev/antd';
 import {
+  CanAccess,
   type HttpError,
   useCan,
   useGetIdentity,
@@ -16,6 +17,8 @@ import { CustomAvatar } from '@components/custom-avatar';
 
 import { formatTimestamp } from '@app/utils/utils-dayjs';
 import { RESOURCE } from '@app/constants/resource';
+import { useSession } from 'next-auth/react';
+import { useGetUserRole } from '@hooks/useGetUserRole';
 
 type Props = {
   style?: React.CSSProperties;
@@ -45,7 +48,7 @@ export const Comments: FC<Props> = ({ style }) => {
 export const CommentForm = () => {
   const params = useParams();
   const issueId = params.id;
-  const { data: me } = useGetIdentity<any>();
+  const { data } = useSession();
 
   const { formProps, onFinish, form, formLoading } = useForm<any, HttpError>({
     action: 'create',
@@ -84,6 +87,11 @@ export const CommentForm = () => {
     }
   };
 
+  const { isAdmin, isMember } = useGetUserRole();
+  if (!isAdmin && !isMember) {
+    return null;
+  }
+
   return (
     <div
       style={{
@@ -95,8 +103,7 @@ export const CommentForm = () => {
     >
       <CustomAvatar
         style={{ flexShrink: 0 }}
-        name={me?.username}
-        src={me?.avatarUrl}
+        name={data?.user?.username}
       />
       <Form {...formProps} style={{ width: '100%' }} onFinish={handleOnFinish}>
         <Form.Item
@@ -124,7 +131,6 @@ export const CommentForm = () => {
 
 export const CommentList = () => {
   const params = useParams();
-  const invalidate = useInvalidate();
 
   const { data } = useList<any>({
     resource: resource,
@@ -133,17 +139,11 @@ export const CommentList = () => {
     },
     sorters: [
       {
-        field: 'createdAt',
+        field: 'createdTime',
         order: 'desc',
       },
     ],
     filters: [{ field: 'issueId', operator: 'eq', value: params.id }],
-  });
-
-  const { data: canDelete } = useCan({
-    resource: 'comments',
-    action: 'delete',
-    params: {},
   });
 
   const { formProps, setId, id, saveButtonProps } = useForm<
@@ -156,23 +156,22 @@ export const CommentList = () => {
     queryOptions: {
       enabled: false,
     },
+    redirect: false,
     mutationMode: 'optimistic',
     onMutationSuccess: () => {
       setId(undefined);
-      invalidate({
-        invalidates: ['list'],
-        resource: 'companyNotes',
-      });
     },
     successNotification: () => ({
-      key: 'company-update-note',
-      message: 'Successfully updated note',
+      key: 'delete-comment',
+      message: 'Successfully updated comment',
       description: 'Successful',
       type: 'success',
     }),
   });
 
-  const { data: me } = useGetIdentity<any>();
+  const { data: userData } = useSession();
+  const { isAdmin, isMember } = useGetUserRole();
+  const username = userData?.user.username;
 
   return (
     <Space
@@ -185,7 +184,7 @@ export const CommentList = () => {
       }}
     >
       {data?.data?.map((item) => {
-        const isMe = true;
+        const isMe = item.createdBy === username;
         return (
           <div key={item.id} style={{ display: 'flex', gap: '12px' }}>
             <CustomAvatar style={{ flexShrink: 0 }} name={item.createdBy} />
@@ -246,26 +245,30 @@ export const CommentList = () => {
                   {item.content}
                 </Typography.Paragraph>
               )}
-
-              {isMe && !id && (
-                <Space size={16}>
+              <Space size={0} >
+                {isMe && !id && (
                   <Typography.Link
                     type="secondary"
                     style={{
                       fontSize: '12px',
+                      marginRight: '12px',
                     }}
                     onClick={() => setId(item.id)}
                   >
                     Edit
                   </Typography.Link>
+                )}
+                {((isMe || isAdmin) && !id) && (
                   <DeleteButton
+                    accessControl={{ enabled: true }}
+                    disabled={false}
                     resource="comments"
                     recordItemId={item.id}
                     size="small"
                     type="link"
                     successNotification={() => ({
-                      key: 'company-delete-note',
-                      message: 'Successfully deleted note',
+                      key: 'delete-comment',
+                      message: 'Successfully deleted comment',
                       description: 'Successful',
                       type: 'success',
                     })}
@@ -273,11 +276,11 @@ export const CommentList = () => {
                     className="ant-typography secondary"
                     style={{
                       fontSize: '12px',
+                      paddingLeft: 0
                     }}
                   />
-                </Space>
-              )}
-
+                )}
+              </Space>
               {id === item.id && (
                 <Space>
                   <Button size="small" onClick={() => setId(undefined)}>

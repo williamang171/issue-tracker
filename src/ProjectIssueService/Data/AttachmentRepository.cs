@@ -39,6 +39,15 @@ public class AttachmentRepository(ApplicationDbContext context, IMapper mapper) 
         {
             query = query.Where(x => x.IssueId == parameters.IssueId);
         }
+        bool isAscending = parameters._order.Equals("ASC", StringComparison.CurrentCultureIgnoreCase);
+        query = parameters._sort switch
+        {
+            "createdTime" => isAscending
+                ? query.OrderBy(s => s.CreatedTime)
+                : query.OrderByDescending(s => s.CreatedTime),
+            _ => query // Default case returns query unchanged
+        };
+
         return await query.ProjectTo<AttachmentDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 

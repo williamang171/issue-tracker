@@ -6,10 +6,11 @@ import {
 } from '@app/constants/issue-priority';
 import { ISSUE_STATUS, ISSUE_STATUS_ARRAY } from '@app/constants/issue-status';
 import { ISSUE_TYPE, ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
-import { PlusSquareOutlined, SearchOutlined } from '@ant-design/icons';
+import { EyeOutlined, PlusSquareOutlined, SearchOutlined } from '@ant-design/icons';
 import { renderEnumFieldLabel } from '@app/utils/utils-table-col-render';
 import {
   DeleteButton,
+  EditButton,
   FilterDropdown,
   getDefaultSortOrder,
   List,
@@ -18,8 +19,10 @@ import {
 } from '@refinedev/antd';
 import {
   BaseKey,
+  CanAccess,
   CrudFilters,
   getDefaultFilter,
+  useCan,
   type BaseRecord,
 } from '@refinedev/core';
 import { Button, Input, InputRef, Space, Table, theme } from 'antd';
@@ -92,18 +95,29 @@ export default function IssueList({
   const projects = queryResult?.data?.data || [];
   const users = usersQueryResult?.data?.data || [];
 
+  const hrefForCreate = useMemo(() => {
+    if (projectId) {
+      return `/issues/create/?projectId=${projectId}`
+    }
+    return `/issues/create`;
+  }, [projectId]);
+
+  const computeHrefForEdit = (record: BaseRecord) => {
+    if (projectId) {
+      return `/issues/edit/${record.id}?projectId=${projectId}`;
+    }
+    return `/issues/edit/${record.id}`
+  }
+  const result = useCan({ action: 'create', resource: 'issues' })
+
   return (
     <List
       resource="issues"
       breadcrumb={false}
       title="Issues"
       headerButtons={
-        <Link
-          href={
-            projectId ? `/issues/create/?from=${projectId}` : `/issues/create`
-          }
-        >
-          <Button type="primary" icon={<PlusSquareOutlined />}>
+        <Link href={hrefForCreate}>
+          <Button disabled={!result?.data?.can} type="primary" icon={<PlusSquareOutlined />}>
             Create
           </Button>
         </Link>
@@ -245,16 +259,10 @@ export default function IssueList({
           dataIndex="actions"
           render={(_, record: BaseRecord) => (
             <Space>
-              <Link href={`/issues/edit/${record.id}?from=${projectId}`}>
-                Details
+              <Link href={computeHrefForEdit(record)}>
+                <Button size="small" icon={<EyeOutlined />} />
               </Link>
-              <DeleteButton
-                size="small"
-                resource={RESOURCE.issues}
-                recordItemId={record.id}
-                icon={null}
-                type="link"
-              />
+
             </Space>
           )}
         />
