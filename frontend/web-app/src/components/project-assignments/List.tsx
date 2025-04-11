@@ -50,7 +50,7 @@ export const UsersList = ({ projectId }: { projectId: BaseKey }) => {
     } = useModalForm({
         action: 'create',
         syncWithLocation: false,
-        resource: `${resource}/bulk`,
+        resource: `${resource}`,
         successNotification: {
             description: 'Success',
             message: 'Added users to project',

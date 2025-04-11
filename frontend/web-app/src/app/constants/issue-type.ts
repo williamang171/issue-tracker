@@ -1,3 +1,4 @@
+import { purple, red, blue } from '@ant-design/colors';
 import { createConstantObject } from "../utils/utils-constants";
 
 export const BUG = 0;
@@ -5,13 +6,13 @@ export const FEATURE_REQUEST = 1;
 export const OTHER = 2;
 
 export const ISSUE_TYPE = {
-    [BUG]: createConstantObject(BUG, 'Bug', '#E53935'),
+    [BUG]: createConstantObject(BUG, 'Bug', red.primary),
     [FEATURE_REQUEST]: createConstantObject(
         FEATURE_REQUEST,
         'Feature Request',
-        '#009688'
+        blue.primary
     ),
-    [OTHER]: createConstantObject(OTHER, 'Other', '#9C27B0'),
+    [OTHER]: createConstantObject(OTHER, 'Other', purple.primary),
 } as const;
 
 export type Type = typeof ISSUE_TYPE[keyof typeof ISSUE_TYPE];
