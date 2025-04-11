@@ -17,7 +17,6 @@ import { Card } from 'antd';
 
 export const ProjectBarChart = (props: { data: any[]; title: string }) => {
   const { data, title } = props;
-  console.log(data);
   return (
     <Card
       style={{ height: '400px', width: '100%', padding: 0 }}

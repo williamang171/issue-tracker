@@ -10,6 +10,7 @@ using ProjectIssueService.Extensions;
 using ProjectIssueService.Services;
 using MassTransit;
 using Contracts;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ProjectIssueService.Controllers;
 
@@ -22,7 +23,8 @@ public class ProjectAssignmentsController(
     IUserRepository userRepo,
     IMapper mapper,
     IPublishEndpoint publishEndpoint,
-    IProjectAssignmentServices projectAssignmentServices
+    IProjectAssignmentServices projectAssignmentServices,
+    IPublishBatchService publishBatchService
     )
     : ControllerBase
 {
@@ -71,7 +73,7 @@ public class ProjectAssignmentsController(
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost("bulk")]
+    [HttpPost]
     public async Task<ActionResult<BulkProjectAssignmentResultDto>> CreateBulkProjectAssignments(BulkProjectAssignmentCreateDto dto)
     {
         var projectId = dto.ProjectId;
@@ -124,61 +126,10 @@ public class ProjectAssignmentsController(
             });
         }
 
-        await publishEndpoint.PublishBatch(toPublish);
+        await publishBatchService.PublishBatchProjectAssignments(toPublish);
         await repo.SaveChangesAsync();
         result.Summary = $"Successfully assigned {result.SuccessfulAssignments.Count} out of {dto.UserNames.Count} users";
-        return Ok(result);
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpPost]
-    public async Task<ActionResult<ProjectAssignmentDto>> CreateProjectAssignment(ProjectAssignmentCreateDto dto)
-    {
-        var projectId = dto.ProjectId;
-        var project = await projectRepo.GetProjectByIdAsync(projectId);
-
-        if (project == null)
-        {
-            return BadRequest("Project not found");
-        }
-
-        var existing = await repo.GetProjectAssignmentByProjectIdAndUserNameAsync(projectId, dto.UserName);
-
-        if (existing != null)
-        {
-            return BadRequest("User has already been assigned to project");
-        }
-
-        if (await userRepo.GetUserEntityByUserName(dto.UserName) == null)
-        {
-            return BadRequest("User not found");
-        }
-
-        var projectAssignment = mapper.Map<ProjectAssignment>(dto);
-        projectAssignment.Version = Guid.NewGuid();
-
-        repo.AddProjectAssignment(projectAssignment);
-
-        var newProjectAssignment = mapper.Map<ProjectAssignmentDto>(projectAssignment);
-
-        var toPublish = new ProjectAssignmentCreated()
-        {
-            ProjectId = project.Id,
-            UserName = dto.UserName,
-            Version = newProjectAssignment.Version,
-        };
-        await publishEndpoint.Publish(toPublish);
-
-        if (await repo.SaveChangesAsync())
-        {
-            var newDto = await repo.GetProjectAssignmentByIdAsync(newProjectAssignment.Id);
-            return CreatedAtAction(
-                nameof(GetProjectAssignmentById),
-                new { id = newProjectAssignment.Id },
-                newDto);
-        }
-
-        return BadRequest("Failed to create project assignment");
+        return CreatedAtAction("CreateBulkProjectAssignments", result);
     }
 
     [Authorize(Roles = "Admin")]

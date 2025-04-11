@@ -1,3 +1,4 @@
+import { blue, green, yellow, orange, red } from '@ant-design/colors';
 import { createConstantObject } from "../utils/utils-constants";
 
 export const OPEN = 0;
@@ -6,10 +7,10 @@ export const RESOLVED = 2;
 export const CLOSED = 3;
 
 export const ISSUE_STATUS = {
-    [OPEN]: createConstantObject(OPEN, 'Open', '#2196F3'),
-    [IN_PROGRESS]: createConstantObject(IN_PROGRESS, 'In Progress', '#FFC107'),
-    [RESOLVED]: createConstantObject(RESOLVED, 'Resolved', '#8BC34A'),
-    [CLOSED]: createConstantObject(CLOSED, 'Closed', '#4CAF50'),
+    [OPEN]: createConstantObject(OPEN, 'Open', blue.primary),
+    [IN_PROGRESS]: createConstantObject(IN_PROGRESS, 'In Progress', orange.primary),
+    [RESOLVED]: createConstantObject(RESOLVED, 'Resolved', green[4]),
+    [CLOSED]: createConstantObject(CLOSED, 'Closed', green[7]),
 } as const;
 
 export type Status = typeof ISSUE_STATUS[keyof typeof ISSUE_STATUS];

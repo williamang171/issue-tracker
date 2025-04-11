@@ -10,7 +10,6 @@ type Props = AvatarProps & {
 };
 
 const CustomAvatarComponent: FC<Props> = ({ name = '', style, ...rest }) => {
-  console.log(name);
   return (
     <AntdAvatar
       alt={name}

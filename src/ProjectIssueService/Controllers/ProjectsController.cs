@@ -20,7 +20,8 @@ public class ProjectsController(
     IProjectAssignmentRepository projectAssignmentRepo,
     IMapper mapper,
     IPublishEndpoint publishEndpoint,
-    IProjectAssignmentServices projectAssignmentServices
+    IProjectAssignmentServices projectAssignmentServices,
+    IUserService userService
     )
     : ControllerBase
 {
@@ -29,11 +30,11 @@ public class ProjectsController(
     public async Task<ActionResult<List<ProjectDto>>> GetProjects([FromQuery] ProjectParams parameters)
     {
         // Return empty list if userName not found
-        var userName = HttpContext.GetCurrentUserName();
-        if (string.IsNullOrEmpty(userName)) return Ok(Array.Empty<string>());
+        var userName = userService.GetCurrentUserName();
+        if (string.IsNullOrEmpty(userName)) return new List<ProjectDto>();
 
         // Get projects based on role (if isAdmin get all projects)
-        var isAdmin = HttpContext.CurrentUserRoleIsAdmin();
+        var isAdmin = userService.CurrentUserRoleIsAdmin();
         var response = isAdmin ?
             await repo.GetProjectsPaginatedAsync(parameters, null) :
             await repo.GetProjectsPaginatedAsync(parameters, userName);
@@ -61,10 +62,10 @@ public class ProjectsController(
     public async Task<ActionResult<List<ProjectForSelectDto>>> GetProjectsAll()
     {
         // Return empty list if userName not found
-        var userName = HttpContext.GetCurrentUserName();
-        if (string.IsNullOrEmpty(userName)) return Ok(Array.Empty<string>());
+        var userName = userService.GetCurrentUserName();
+        if (string.IsNullOrEmpty(userName)) return new List<ProjectForSelectDto>();
 
-        var isAdmin = HttpContext.CurrentUserRoleIsAdmin();
+        var isAdmin = userService.CurrentUserRoleIsAdmin();
         var response = isAdmin ? await repo.GetProjectsForSelectAsync(null) : await repo.GetProjectsForSelectAsync(userName);
         return response;
     }
@@ -85,7 +86,7 @@ public class ProjectsController(
         {
             var projectDto = await repo.GetProjectByIdAsync(newProject.Id);
 
-            var curUserName = HttpContext.GetCurrentUserName();
+            var curUserName = userService.GetCurrentUserName();
             if (curUserName != null)
             {
                 var projectAssignment = mapper.Map<ProjectAssignment>(new ProjectAssignmentCreateDto()

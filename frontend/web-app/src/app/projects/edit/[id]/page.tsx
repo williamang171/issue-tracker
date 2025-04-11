@@ -10,10 +10,12 @@ import { useMediaQuery } from 'react-responsive';
 import { Alert, Form, Input, Row, Col } from 'antd';
 import { GoBack } from '@components/goback';
 import { useGetUserRole } from '@hooks/useGetUserRole';
-import { useSession } from 'next-auth/react';
+import { AuditFields } from '@components/fields/audit-fields';
 
 export default function ProjectEdit() {
-  const { formProps, saveButtonProps, query: queryResult } = useForm({});
+  const { formProps, saveButtonProps, query: queryResult, formLoading } = useForm({
+    redirect: false
+  });
 
   const { isAdmin } = useGetUserRole();
 
@@ -25,10 +27,33 @@ export default function ProjectEdit() {
     return <Alert type="error" message="Not Found" />;
   }
 
+  const leftColProps = {
+    xl: 10,
+    lg: 14,
+    md: 24,
+    sm: 24,
+    xs: 24
+  };
+  const rightColProps = {
+    xl: 14,
+    lg: 10,
+    md: 24,
+    sm: 24,
+    xs: 24
+  };
+  const leftTopColProps = {
+    ...leftColProps,
+    lg: 24,
+  };
+  const rightTopColProps = {
+    ...rightColProps,
+    lg: 24
+  }
+
   return (
     <div>
       <Row gutter={[24, 24]}>
-        <Col md={10} lg={10} xl={12} sm={24} xs={24}>
+        <Col {...leftTopColProps} >
           <Edit
             title={
               <GoBack
@@ -39,9 +64,9 @@ export default function ProjectEdit() {
             breadcrumb={false}
             saveButtonProps={{
               ...saveButtonProps,
-              disabled: !isAdmin
+              disabled: !isAdmin || formLoading
             }}
-            isLoading={queryResult?.status === 'loading'}
+            isLoading={formLoading || queryResult?.status === 'loading'}
             headerButtons={<div />}
             goBack={null}
             canDelete
@@ -69,19 +94,21 @@ export default function ProjectEdit() {
               >
                 <Input.TextArea rows={5} />
               </Form.Item>
+              <AuditFields />
             </Form>
           </Edit>
-          <div style={{ marginBottom: '24px' }} />
+        </Col>
+        <Col {...rightTopColProps}>
           {queryResult?.data?.data.id ? (
-            <UsersList projectId={queryResult?.data?.data.id} />
+            <>
+              {isDesktop ? <div style={{ marginBottom: '48px' }} /> : null}
+              <IssueList projectId={queryResult?.data?.data.id} />
+            </>
           ) : null}
         </Col>
         <Col
-          md={14}
-          lg={14}
-          xl={12}
-          sm={24}
-          style={{ marginTop: isDesktop ? '52px' : '0px' }}
+          {...leftColProps}
+
         >
           <DashboardCharts
             issuePriorityCountData={issuePriorityCountData}
@@ -89,11 +116,12 @@ export default function ProjectEdit() {
             issueTypeCountData={issueTypeCountData}
           />
         </Col>
-        <Col sm={24} md={24}>
+        <Col {...rightColProps}>
           {queryResult?.data?.data.id ? (
-            <IssueList projectId={queryResult?.data?.data.id} />
+            <UsersList projectId={queryResult?.data?.data.id} />
           ) : null}
         </Col>
+
       </Row>
 
       <div style={{ marginBottom: '24px' }} />

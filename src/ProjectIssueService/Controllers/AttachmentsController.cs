@@ -29,7 +29,7 @@ namespace ProjectIssueService.Controllers
 
         [Authorize(Roles = "Admin,Member")]
         [HttpPost]
-        public async Task<IActionResult> CreateAttachment(AttachmentCreateDto dto)
+        public async Task<ActionResult<AttachmentDto>> CreateAttachment(AttachmentCreateDto dto)
         {
             var issueId = dto.IssueId;
             var issue = await _issueRepo.GetIssueByIdAsync(issueId);
@@ -104,7 +104,7 @@ namespace ProjectIssueService.Controllers
 
         [Authorize(Roles = "Admin,Member")]
         [HttpDelete("{id}")]
-        public async Task<ActionResult<List<AttachmentDto>>> DeleteAttachment(Guid id)
+        public async Task<IActionResult> DeleteAttachment(Guid id)
         {
             // Check if entity exists
             var entity = await _attachmentRepository.GetAttachmentEntityById(id);
@@ -124,7 +124,7 @@ namespace ProjectIssueService.Controllers
 
             _attachmentRepository.RemoveAttachment(entity);
 
-            if (await _issueRepo.SaveChangesAsync()) return Ok();
+            if (await _attachmentRepository.SaveChangesAsync()) return Ok();
 
             return BadRequest("Failed to delete attachment");
         }

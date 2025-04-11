@@ -5,7 +5,7 @@ import { ISSUE_STATUS_ARRAY } from '@app/constants/issue-status';
 import { ISSUE_TYPE_ARRAY } from '@app/constants/issue-type';
 import { mapToSelectItemObject } from '@app/utils/uitils-select';
 import { Edit, useForm, useSelect } from '@refinedev/antd';
-import { Col, Form, Input, Row, Select } from 'antd';
+import { Alert, Col, Form, Input, Row, Select } from 'antd';
 import AssigneeFormItem from './AssigneeFormItem';
 import { Comments } from '@components/comment/comments';
 import { AttachmentList } from '@components/attachment/list';
@@ -15,6 +15,7 @@ import { useSearchParams } from 'next/navigation';
 import { GoBack } from '@components/goback';
 import { useSession } from 'next-auth/react';
 import { useGetUserRole } from '@hooks/useGetUserRole';
+import { AuditFields } from '@components/fields/audit-fields';
 
 export default function IssueEdit() {
   const searchParams = useSearchParams();
@@ -25,10 +26,10 @@ export default function IssueEdit() {
     saveButtonProps,
     query: queryResult,
     onFinish,
+    formLoading
   } = useForm({
-    redirect: projectId ? false : 'list',
+    redirect: false,
   });
-  const { edit } = useNavigation();
 
   const { selectProps: projectSelectProps } = useSelect({
     resource: 'projects/all',
@@ -41,11 +42,12 @@ export default function IssueEdit() {
       ...values,
       unassignUser: values.assignee === undefined,
     });
-    if (typeof projectId === 'string') {
-      edit(RESOURCE.projects, projectId);
-    }
   };
   const { isAdmin, isReadOnly } = useGetUserRole();
+
+  if (queryResult?.status === 'error') {
+    return <Alert type="error" message="Not Found" />;
+  }
 
   return (
     <div>
@@ -57,6 +59,7 @@ export default function IssueEdit() {
           ...saveButtonProps,
           disabled: isReadOnly
         }}
+        isLoading={formLoading || queryResult?.status === 'loading'}
         breadcrumb={false}
         headerButtons={<div />}
         title={
@@ -151,6 +154,7 @@ export default function IssueEdit() {
             />
           </Form.Item>
           <AssigneeFormItem projectId={queryResult?.data?.data.projectId} />
+          <AuditFields />
         </Form>
       </Edit>
       <div style={{ marginBottom: '24px' }} />

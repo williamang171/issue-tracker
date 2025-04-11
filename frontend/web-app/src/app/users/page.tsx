@@ -10,7 +10,7 @@ import {
 } from '@refinedev/antd';
 import { getDefaultFilter, useList, type BaseRecord } from '@refinedev/core';
 import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
-import { Input, InputRef, Space, Table, theme } from 'antd';
+import { Badge, Input, InputRef, Space, Table, theme } from 'antd';
 import { useRef } from 'react';
 import { RESOURCE } from '@app/constants/resource';
 import { useGetUserRole } from '@hooks/useGetUserRole';
@@ -78,6 +78,14 @@ export default function UserList() {
                         return (<div>
                             {role?.name}
                         </div>)
+                    }}
+                />
+
+                <Table.Column
+                    dataIndex="isActive"
+                    title={'Is Active'}
+                    render={(v) => {
+                        return v ? "True" : "False";
                     }}
                 />
 

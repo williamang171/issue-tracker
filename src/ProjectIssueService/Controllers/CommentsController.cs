@@ -18,7 +18,8 @@ public class CommentsController(
     ICommentRepository commentRepo,
     IIssueRepository issueRepo,
     IMapper mapper,
-    IProjectAssignmentServices projectAssignmentServices
+    IProjectAssignmentServices projectAssignmentServices,
+    IUserService userService
     ) : ControllerBase
 {
     private readonly IIssueRepository _issueRepo = issueRepo;
@@ -103,7 +104,7 @@ public class CommentsController(
         if (comment == null) return NotFound();
 
         // A comment can only be updated by the owner of it
-        var userName = HttpContext.GetCurrentUserName();
+        var userName = userService.GetCurrentUserName();
         if (comment.CreatedBy != userName) return Forbid();
 
         comment.Content = dto.Content ?? comment.Content;
@@ -122,13 +123,13 @@ public class CommentsController(
 
         // Admin can remove all comments
         // Members can only remove their own comments
-        var isAdmin = HttpContext.CurrentUserRoleIsAdmin();
-        var userName = HttpContext.GetCurrentUserName();
+        var isAdmin = userService.CurrentUserRoleIsAdmin();
+        var userName = userService.GetCurrentUserName();
         if (!isAdmin && userName != comment.CreatedBy) return Forbid();
 
         _commentRepo.RemoveComment(comment);
 
-        if (await _issueRepo.SaveChangesAsync()) return Ok();
+        if (await _commentRepo.SaveChangesAsync()) return Ok();
 
         return BadRequest("Failed to delete comment");
     }
