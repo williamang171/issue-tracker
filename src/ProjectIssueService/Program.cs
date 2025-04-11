@@ -66,7 +66,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
 builder.Services.AddScoped<IProjectAssignmentServices, ProjectAssignmentServices>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFileUploadService, CloudinaryFileUploadService>();
+builder.Services.AddScoped<IPublishBatchService, PublishBatchService>();
 builder.Services.AddSingleton<IAuthorizationHandler, CustomRoleHandler>();
 
 var app = builder.Build();

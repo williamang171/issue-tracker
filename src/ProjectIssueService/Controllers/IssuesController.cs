@@ -21,7 +21,8 @@ public class IssuesController(
     IUserRepository userRepo,
     IMapper mapper,
     IPublishEndpoint publishEndpoint,
-    IProjectAssignmentServices projectAssignmentServices
+    IProjectAssignmentServices projectAssignmentServices,
+    IUserService userService
     ) : ControllerBase
 {
     private readonly IIssueRepository _issueRepo = issueRepo;
@@ -32,11 +33,11 @@ public class IssuesController(
     public async Task<ActionResult<List<IssueDto>>> GetIssues([FromQuery] IssueParams parameters)
     {
         // Return empty list if userName not found
-        var userName = HttpContext.GetCurrentUserName();
-        if (string.IsNullOrEmpty(userName)) return Ok(Array.Empty<string>());
+        var userName = userService.GetCurrentUserName();
+        if (string.IsNullOrEmpty(userName)) return new List<IssueDto>();
 
         // Get issues based on role (if isAdmin get all issues)
-        var isAdmin = HttpContext.CurrentUserRoleIsAdmin();
+        var isAdmin = userService.CurrentUserRoleIsAdmin();
         var response = isAdmin ?
             await _issueRepo.GetIssuesPaginatedAsync(parameters, null) :
             await _issueRepo.GetIssuesPaginatedAsync(parameters, userName);
@@ -178,8 +179,8 @@ public class IssuesController(
 
         // Check if user has permission to delete this issue
         // Admin can delete all issues, while members can delete their own issues
-        var isAdmin = HttpContext.CurrentUserRoleIsAdmin();
-        var canDelete = isAdmin || issue.CreatedBy == HttpContext.GetCurrentUserName();
+        var isAdmin = userService.CurrentUserRoleIsAdmin();
+        var canDelete = isAdmin || issue.CreatedBy == userService.GetCurrentUserName();
         if (!canDelete) return Forbid();
 
         // Delete issue and publish event
