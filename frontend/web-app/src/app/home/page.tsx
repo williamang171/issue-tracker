@@ -2,6 +2,6 @@
 import React from 'react';
 import HomePage from '@components/home';
 
-export default async function Layout({ children }: React.PropsWithChildren) {
+export default async function Layout() {
   return <HomePage />;
 }

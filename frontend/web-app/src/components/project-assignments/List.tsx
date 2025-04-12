@@ -38,7 +38,6 @@ export const UsersList = ({ projectId }: { projectId: BaseKey }) => {
             }
         ]
     });
-    const projectAssignments = data?.data || [];
 
     // Create Modal
     const {
@@ -51,6 +50,7 @@ export const UsersList = ({ projectId }: { projectId: BaseKey }) => {
         action: 'create',
         syncWithLocation: false,
         resource: `${resource}`,
+        redirect: false,
         successNotification: {
             description: 'Success',
             message: 'Added users to project',

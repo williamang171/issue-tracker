@@ -20,7 +20,7 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import Loading from '@components/loading/Loading';
-import { accessControlProvider } from './utils/access-control-provider';
+import { accessControlProvider, fetchRoleAndSaveToSessionStorage } from './utils/access-control-provider';
 import HomePage from '@components/home';
 
 type RefineContextProps = {
@@ -61,26 +61,18 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
   );
 
   const fetchRole = async () => {
-    if (data?.accessToken) {
-      if (fetchedRole) {
-        return;
-      }
-      await fetch(`${API_URL}/users/getCurrentUserRole`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          authorization: `Bearer ${data?.accessToken}`,
-        },
-      })
-        .then(async (data) => {
-          const json = await data.json();
-          sessionStorage.setItem('role', json.roleCode);
-          setFetchedRole(true);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    if (!data?.accessToken) {
+      return;
     }
+    if (fetchedRole) {
+      return;
+    }
+    await fetchRoleAndSaveToSessionStorage(data?.accessToken).then(() => {
+      setFetchedRole(true);
+    }).catch((err) => {
+      console.error(err);
+      setFetchedRole(true);
+    });
   };
 
   useEffect(() => {
@@ -93,6 +85,10 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
 
   if (status !== 'authenticated' && to === '/') {
     return <HomePage />;
+  }
+
+  if (!fetchedRole) {
+    return <Loading />;
   }
 
   const authProvider: AuthBindings = {
@@ -196,7 +192,6 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
                 list: '/projects',
                 create: '/projects/create',
                 edit: '/projects/edit/:id',
-                show: '/projects/show/:id',
                 meta: {
                   icon: <ProjectOutlined />,
                 },
@@ -217,7 +212,6 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
                 list: '/users',
                 create: '/users/create',
                 edit: '/users/edit/:id',
-                show: '/users/show/:id',
                 meta: {
                   icon: <TeamOutlined />,
                   canDelete: true,

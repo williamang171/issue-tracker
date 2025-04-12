@@ -26,33 +26,39 @@ export default function ProjectEdit() {
 
   const { issuePriorityCountData, issueStatusCountData, issueTypeCountData } =
     useGetProjectChartsData();
-  const isDesktop = useMediaQuery({ minWidth: 768 });
+  const isDesktop = useMediaQuery({ minWidth: 1200 });
 
   if (queryResult?.status === 'error') {
     return <Alert type="error" message="Not Found" />;
   }
 
-  const leftColProps = {
-    xl: 10,
-    lg: 24,
-    md: 24,
-    sm: 24,
-    xs: 24,
-  };
-  const rightColProps = {
-    xl: 14,
-    lg: 24,
-    md: 24,
-    sm: 24,
-    xs: 24,
-  };
   const leftTopColProps = {
-    ...leftColProps,
+    xl: 8,
     lg: 24,
+    md: 24,
+    sm: 24,
+    xs: 24,
   };
   const rightTopColProps = {
-    ...rightColProps,
+    xl: 16,
     lg: 24,
+    md: 24,
+    sm: 24,
+    xs: 24,
+  };
+  const leftBottomColProps = {
+    xl: 12,
+    lg: 24,
+    md: 24,
+    sm: 24,
+    xs: 24,
+  };
+  const rightBottomColProps = {
+    xl: 12,
+    lg: 24,
+    md: 24,
+    sm: 24,
+    xs: 24,
   };
 
   return (
@@ -106,14 +112,14 @@ export default function ProjectEdit() {
             </>
           ) : null}
         </Col>
-        <Col {...leftColProps}>
+        <Col {...leftBottomColProps}>
           <DashboardCharts
             issuePriorityCountData={issuePriorityCountData}
             issueStatusCountData={issueStatusCountData}
             issueTypeCountData={issueTypeCountData}
           />
         </Col>
-        <Col {...rightColProps}>
+        <Col {...rightBottomColProps}>
           {queryResult?.data?.data.id ? (
             <UsersList projectId={queryResult?.data?.data.id} />
           ) : null}
