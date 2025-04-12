@@ -1,28 +1,27 @@
 'use client';
 
-import React, { act, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNotificationProvider } from '@refinedev/antd';
 import { type AuthBindings, Refine } from '@refinedev/core';
 import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar';
 import routerProvider from '@refinedev/nextjs-router';
 import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import { ColorModeContextProvider } from '@contexts/color-mode';
-import { API_URL, dataProvider } from '@providers/data-provider/data-provider.client';
+import {
+  API_URL,
+  dataProvider,
+} from '@providers/data-provider/data-provider.client';
 import '@refinedev/antd/dist/reset.css';
 import { axiosInstance } from './utils/axios-instance';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
-  AuditOutlined,
   ProjectOutlined,
-  ReconciliationOutlined,
   TeamOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons';
-import HomePage from '@components/home';
 import Loading from '@components/loading/Loading';
-
-const canAccess = { can: true };
-const cannotAccess = { can: false, reason: ' ' };
+import { accessControlProvider } from './utils/access-control-provider';
+import HomePage from '@components/home';
 
 type RefineContextProps = {
   defaultMode?: string;
@@ -42,12 +41,10 @@ type AppProps = {
   defaultMode?: string;
 };
 
-const App = ({
-  children,
-  defaultMode,
-}: React.PropsWithChildren<AppProps>) => {
+const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
   const { data, status } = useSession();
   const to = usePathname();
+  const [fetchedRole, setFetchedRole] = useState(false);
 
   axiosInstance.interceptors.request.clear();
   axiosInstance.interceptors.request.use(
@@ -65,24 +62,36 @@ const App = ({
 
   const fetchRole = async () => {
     if (data?.accessToken) {
+      if (fetchedRole) {
+        return;
+      }
       await fetch(`${API_URL}/users/getCurrentUserRole`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          authorization: `Bearer ${data?.accessToken}`
+          authorization: `Bearer ${data?.accessToken}`,
         },
-      }).then(async (data) => {
-        const json = await data.json();
-        sessionStorage.setItem('role', json.roleCode)
-      });
+      })
+        .then(async (data) => {
+          const json = await data.json();
+          sessionStorage.setItem('role', json.roleCode);
+          setFetchedRole(true);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-  }
+  };
+
+  useEffect(() => {
+    fetchRole();
+  }, [data?.accessToken]);
 
   if (status === 'loading') {
     return <Loading />;
   }
 
-  if (status === 'unauthenticated') {
+  if (status !== 'authenticated' && to === '/') {
     return <HomePage />;
   }
 
@@ -132,6 +141,7 @@ const App = ({
         redirect: true,
         callbackUrl: '/',
       });
+      setFetchedRole(false);
 
       return {
         success: true,
@@ -143,9 +153,9 @@ const App = ({
           logout: true,
         };
       }
-
       return {
         error,
+        redirectTo: '/',
       };
     },
     check: async () => {
@@ -179,52 +189,7 @@ const App = ({
             dataProvider={dataProvider}
             notificationProvider={useNotificationProvider}
             authProvider={authProvider}
-            accessControlProvider={{
-              can: async ({ action, params, resource }) => {
-                let role = sessionStorage.getItem("role");
-                if (!role) {
-                  await fetchRole();
-                  role = sessionStorage.getItem("role");
-                }
-                if (role === "Admin") {
-                  return canAccess;
-                }
-                if (resource === "users") {
-                  return cannotAccess;
-                }
-
-                if (role === "Member") {
-                  if (resource === "comments") {
-                    return canAccess;
-                  }
-
-                  if (resource === "issues") {
-                    return canAccess;
-                  }
-
-                  if (resource === "attachments") {
-                    return canAccess;
-                  }
-
-                  if (resource === "projects") {
-                    if (["delete", "create"].includes(action)) {
-                      return cannotAccess;
-                    }
-
-                    return canAccess;
-                  }
-                }
-
-                if (role === "Viewer") {
-                  if (["create", "delete"].includes(action)) {
-                    return cannotAccess;
-                  }
-                  return canAccess;
-                }
-
-                return cannotAccess;
-              },
-            }}
+            accessControlProvider={accessControlProvider}
             resources={[
               {
                 name: 'projects',
@@ -232,7 +197,6 @@ const App = ({
                 create: '/projects/create',
                 edit: '/projects/edit/:id',
                 show: '/projects/show/:id',
-
                 meta: {
                   icon: <ProjectOutlined />,
                 },
@@ -270,7 +234,6 @@ const App = ({
             <RefineKbar />
           </Refine>
         </ColorModeContextProvider>
-
       </RefineKbarProvider>
     </>
   );

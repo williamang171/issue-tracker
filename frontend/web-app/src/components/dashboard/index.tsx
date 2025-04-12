@@ -17,10 +17,10 @@ export const DashboardCharts = ({
       <Col sm={24} md={24} lg={24}>
         <ProjectBarChart data={issueStatusCountData} title="Issues by Status" />
       </Col>
-      <Col sm={24} md={24} lg={24} xl={12}>
+      <Col xs={24} sm={12} md={12} lg={12} xl={12}>
         <ProjectPieChart data={issueTypeCountData} title="Issues by Type" />
       </Col>
-      <Col sm={24} md={24} lg={24} xl={12}>
+      <Col xs={24} sm={12} md={12} lg={12} xl={12}>
         <ProjectPieChart
           data={issuePriorityCountData}
           title="Issues by Priority"

@@ -14,7 +14,9 @@ builder.Services.AddHttpContextAccessor();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost"));
+builder.Services
+    .AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer
+        .Connect(builder.Configuration.GetValue("Redis:Host", "localhost")!));
 
 builder.Services.AddMassTransit(x =>
 {
