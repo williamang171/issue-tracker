@@ -17,12 +17,13 @@ COPY tests/ProjectIssueService.UnitTests/ProjectIssueService.UnitTests.csproj te
 RUN dotnet restore IssueTracker.sln
 
 # Copy the app folders over
-COPY src/IdentityService src/IdentityService
-WORKDIR /app/src/IdentityService
+COPY src/IssueStatsService src/IssueStatsService
+COPY src/Contracts src/Contracts
+WORKDIR /app/src/IssueStatsService
 RUN dotnet publish -c Release -o /app/src/out
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/src/out .
-ENTRYPOINT [ "dotnet", "IdentityService.dll" ]
+ENTRYPOINT [ "dotnet", "IssueStatsService.dll" ]
