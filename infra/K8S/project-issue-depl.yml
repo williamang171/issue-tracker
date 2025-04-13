@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-issue-svc
+spec:
+  selector:
+    matchLabels:
+      app: project-issue-svc
+  template:
+    metadata:
+      labels:
+        app: project-issue-svc
+    spec:
+      containers:
+        - name: project-issue-svc
+          image: w6731827/project-issue-svc:latest
+          imagePullPolicy: Never
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              value: Server=postgres-clusterip;User Id=postgres;Password=postgrespw;Database=projecttasks
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: auction-secret
+              #     key: connString
+            - name: RabbitMQ__Username
+              value: rabbit
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: rabbit-secret
+              #     key: username
+            - name: RabbitMQ__Password
+              value: rabbitpw
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: rabbit-secret
+              #     key: password
+          envFrom:
+            - configMapRef:
+                name: project-issue-svc-config
+          ports:
+            - containerPort: 80
+              name: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-issue-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    app: project-issue-svc
+  ports:
+    - port: 80
+      targetPort: 80
+      name: web

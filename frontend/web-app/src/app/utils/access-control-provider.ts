@@ -6,7 +6,7 @@ import {
 export const canAccess = { can: true };
 export const cannotAccess = { can: false, reason: ' ' };
 
-export const fetchRoleAndSaveToSessionStorage = async (accessToken?: string) => {
+export const fetchRoleAndSaveToCache = async (accessToken?: string) => {
   if (!accessToken) {
     return;
   }
@@ -19,22 +19,22 @@ export const fetchRoleAndSaveToSessionStorage = async (accessToken?: string) => 
   })
     .then(async (data) => {
       const json = await data.json();
-      sessionStorage.setItem('role', json.roleCode);
+      localStorage.setItem('role', json.roleCode);
     })
     .catch((err) => {
       console.log(err);
     });
 };
 
-export const getRoleFromSessionStorage = async () => {
+export const getRoleFromCache = async () => {
   const maxRetries = 10;
   const retryDelay = 500;
-  let role = sessionStorage.getItem('role');
+  let role = localStorage.getItem('role');
   let retryCount = 0;
 
   while (!role && retryCount < maxRetries) {
     await new Promise(resolve => setTimeout(resolve, retryDelay));
-    role = sessionStorage.getItem('role');
+    role = localStorage.getItem('role');
     retryCount++;
   }
 
@@ -43,7 +43,7 @@ export const getRoleFromSessionStorage = async () => {
 
 export const accessControlProvider: AccessControlProvider = {
   can: async ({ action, params, resource }) => {
-    let role = await getRoleFromSessionStorage();
+    let role = await getRoleFromCache();
     if (!role) {
       return cannotAccess;
     }

@@ -8,6 +8,8 @@ using ProjectIssueService.AuthorizationHandler;
 using ProjectIssueService.Middlewares;
 using ProjectIssueService.Services;
 using dotenv.net;
+using Polly;
+using Npgsql;
 
 DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 
@@ -80,13 +82,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-try
-{
-    DbInitializer.InitDb(app);
-}
-catch (Exception e)
-{
-    Console.WriteLine(e);
-}
+var retryPolicy = Policy
+    .Handle<NpgsqlException>()
+    .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(5));
+
+retryPolicy.ExecuteAndCapture(() => DbInitializer.InitDb(app));
 
 app.Run();

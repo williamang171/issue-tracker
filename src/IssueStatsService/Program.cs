@@ -4,19 +4,28 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using StackExchange.Redis;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services
-    .AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer
-        .Connect(builder.Configuration.GetValue("Redis:Host", "localhost")!));
+
+// Define the retry policy for Redis
+var redisRetryPolicy = Policy
+    .Handle<RedisConnectionException>()
+    .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(5));
+
+// Execute your Redis initialization with the retry policy
+redisRetryPolicy.ExecuteAndCapture(() =>
+{
+    // Create the Redis connection
+    var connectionMultiplexer = ConnectionMultiplexer
+        .Connect(builder.Configuration.GetValue("Redis:Host", "localhost")!);
+    builder.Services
+    .AddSingleton<IConnectionMultiplexer>(connectionMultiplexer);
+});
 
 builder.Services.AddMassTransit(x =>
 {
@@ -50,13 +59,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

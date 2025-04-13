@@ -20,6 +20,7 @@ services:
     volumes:
       - /data
   project-issue-svc:
+    image: w6731827/project-issue-svc:latest
     build:
       context: .
       dockerfile: src/ProjectIssueService/Dockerfile
@@ -37,6 +38,7 @@ services:
       - rabbitmq
       - postgres
   identity-svc:
+    image: w6731827/identity-svc:latest
     build:
       context: .
       dockerfile: src/IdentityService/Dockerfile
@@ -51,6 +53,7 @@ services:
     depends_on:
       - postgres
   gateway-svc:
+    image: w6731827/gateway-svc:latest
     build:
       context: .
       dockerfile: src/GatewayService/Dockerfile
@@ -61,6 +64,7 @@ services:
     ports:
       - 6001:80
   user-svc:
+    image: w6731827/user-svc:latest
     build:
       context: .
       dockerfile: src/UserService/Dockerfile
@@ -76,6 +80,7 @@ services:
       - rabbitmq
       - postgres
   issue-stats-svc:
+    image: w6731827/issue-stats-svc:latest
     build:
       context: .
       dockerfile: src/IssueStatsService/Dockerfile
@@ -92,6 +97,7 @@ services:
       - redis
       - postgres
   web-app:
+    image: w6731827/web-app:latest
     build:
       context: .
       dockerfile: frontend/web-app/Dockerfile
@@ -103,7 +109,6 @@ services:
       - AUTH_SECRET="secret"
       - AUTH_URL=http://localhost:3000
       - AUTH_URL_INTERNAL=http://web-app:3000
-      - API_URL=http://localhost:6001/api
       - API_URL_INTERNAL=http://gateway-svc/api
       - ID_URL=http://localhost:5000
       - ID_URL_INTERNAL=http://identity-svc

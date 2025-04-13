@@ -20,7 +20,7 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import Loading from '@components/loading/Loading';
-import { accessControlProvider, fetchRoleAndSaveToSessionStorage } from './utils/access-control-provider';
+import { accessControlProvider, fetchRoleAndSaveToCache } from './utils/access-control-provider';
 import HomePage from '@components/home';
 
 type RefineContextProps = {
@@ -67,7 +67,7 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
     if (fetchedRole) {
       return;
     }
-    await fetchRoleAndSaveToSessionStorage(data?.accessToken).then(() => {
+    await fetchRoleAndSaveToCache(data?.accessToken).then(() => {
       setFetchedRole(true);
     }).catch((err) => {
       console.error(err);
@@ -85,10 +85,6 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
 
   if (status !== 'authenticated' && to === '/') {
     return <HomePage />;
-  }
-
-  if (!fetchedRole) {
-    return <Loading />;
   }
 
   const authProvider: AuthBindings = {
@@ -132,7 +128,7 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
       };
     },
     logout: async () => {
-      sessionStorage.removeItem('role');
+      localStorage.removeItem('role');
       signOut({
         redirect: true,
         callbackUrl: '/',
