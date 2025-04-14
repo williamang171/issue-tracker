@@ -17,11 +17,10 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: ConnectionStrings__DefaultConnection
-              value: Server=postgres-clusterip;User Id=postgres;Password=postgrespw;Database=identity
-              # valueFrom:
-              #   secretKeyRef:
-              #     name: identity-secret
-              #     key: connString
+              valueFrom:
+                secretKeyRef:
+                  name: identity-secret
+                  key: connString
           envFrom:
             - configMapRef:
                 name: identity-svc-config

@@ -17,11 +17,10 @@ spec:
           imagePullPolicy: Never
           env:
             - name: AUTH_SECRET
-              value: secret
-              # valueFrom:
-              #   secretKeyRef:
-              #     name: webapp-secret
-              #     key: authSecret
+              valueFrom:
+                secretKeyRef:
+                  name: webapp-secret
+                  key: authSecret
           envFrom:
             - configMapRef:
                 name: webapp-svc-config

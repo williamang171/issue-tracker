@@ -17,17 +17,15 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: RabbitMQ__Username
-              value: rabbit
-              # valueFrom:
-              #   secretKeyRef:
-              #     name: rabbit-secret
-              #     key: username
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-secret
+                  key: username
             - name: RabbitMQ__Password
-              value: rabbitpw
-              # valueFrom:
-              #   secretKeyRef:
-              #     name: rabbit-secret
-              #     key: password
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-secret
+                  key: password
           envFrom:
             - configMapRef:
                 name: issue-stats-svc-config

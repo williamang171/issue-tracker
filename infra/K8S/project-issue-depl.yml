@@ -17,23 +17,20 @@ spec:
           imagePullPolicy: Never
           env:
             - name: ConnectionStrings__DefaultConnection
-              value: Server=postgres-clusterip;User Id=postgres;Password=postgrespw;Database=projecttasks
-              # valueFrom:
-              #   secretKeyRef:
-              #     name: auction-secret
-              #     key: connString
+              valueFrom:
+                secretKeyRef:
+                  name: project-issue-secret
+                  key: connString
             - name: RabbitMQ__Username
-              value: rabbit
-              # valueFrom:
-              #   secretKeyRef:
-              #     name: rabbit-secret
-              #     key: username
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-secret
+                  key: username
             - name: RabbitMQ__Password
-              value: rabbitpw
-              # valueFrom:
-              #   secretKeyRef:
-              #     name: rabbit-secret
-              #     key: password
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-secret
+                  key: password
           envFrom:
             - configMapRef:
                 name: project-issue-svc-config
