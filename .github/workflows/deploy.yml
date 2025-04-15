@@ -16,16 +16,16 @@ jobs:
         service:
           - name: "w6731827/project-issue-svc"
             path: "src/ProjectIssueService"
-          # - name: "w6731827/user-svc"
-          #   path: "src/UserService"
-          # - name: "w6731827/identity-svc"
-          #   path: "src/IdentityService"
-          # - name: "w6731827/gateway-svc"
-          #   path: "src/GatewayService"
-          # - name: "w6731827/issue-stats-svc"
-          #   path: "src/IssueStatsService"
-          # - name: "w6731827/web-app"
-          #   path: "frontend/web-app"
+          - name: "w6731827/user-svc"
+            path: "src/UserService"
+          - name: "w6731827/identity-svc"
+            path: "src/IdentityService"
+          - name: "w6731827/gateway-svc"
+            path: "src/GatewayService"
+          - name: "w6731827/issue-stats-svc"
+            path: "src/IssueStatsService"
+          - name: "w6731827/web-app"
+            path: "frontend/web-app"
 
     steps:
       - name: Checkout code
