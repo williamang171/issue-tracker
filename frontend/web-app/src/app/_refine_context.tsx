@@ -22,6 +22,7 @@ import {
 import Loading from '@components/loading/Loading';
 import { accessControlProvider, fetchRoleAndSaveToCache } from './utils/access-control-provider';
 import HomePage from '@components/home';
+import { SessionWrapperContextProvider } from '@contexts/session-wrapper';
 
 type RefineContextProps = {
   defaultMode?: string;
@@ -32,7 +33,9 @@ export const RefineContext = (
 ) => {
   return (
     <SessionProvider refetchOnWindowFocus={false}>
-      <App {...props} />
+      <SessionWrapperContextProvider>
+        <App {...props} />
+      </SessionWrapperContextProvider>
     </SessionProvider>
   );
 };
@@ -44,48 +47,6 @@ type AppProps = {
 const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
   const { data, status } = useSession();
   const to = usePathname();
-  const [fetchedRole, setFetchedRole] = useState(false);
-
-  axiosInstance.interceptors.request.clear();
-  axiosInstance.interceptors.request.use(
-    async (config) => {
-      const token = data?.accessToken;
-      if (token && config?.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
-
-  const fetchRole = async () => {
-    if (!data?.accessToken) {
-      return;
-    }
-    if (fetchedRole) {
-      return;
-    }
-    await fetchRoleAndSaveToCache(data?.accessToken).then(() => {
-      setFetchedRole(true);
-    }).catch((err) => {
-      console.error(err);
-      setFetchedRole(true);
-    });
-  };
-
-  useEffect(() => {
-    fetchRole();
-  }, [data?.accessToken]);
-
-  if (status === 'loading') {
-    return <Loading />;
-  }
-
-  if (status !== 'authenticated' && to === '/') {
-    return <HomePage />;
-  }
 
   const authProvider: AuthBindings = {
     login: async ({ providerName, email, password }: any) => {
@@ -133,7 +94,6 @@ const App = ({ children, defaultMode }: React.PropsWithChildren<AppProps>) => {
         redirect: true,
         callbackUrl: '/',
       });
-      setFetchedRole(false);
 
       return {
         success: true,

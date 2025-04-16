@@ -24,7 +24,7 @@ export default function ProjectEdit() {
 
   const { isAdmin } = useGetUserRole();
 
-  const { issuePriorityCountData, issueStatusCountData, issueTypeCountData } =
+  const { issuePriorityCountData, issueStatusCountData, issueTypeCountData, issueStatusCountDataIsFetched, issuePriorityCountDataIsFetched, issueTypeCountDataIsFetched } =
     useGetProjectChartsData();
   const isDesktop = useMediaQuery({ minWidth: 1200 });
 
@@ -114,9 +114,12 @@ export default function ProjectEdit() {
         </Col>
         <Col {...leftBottomColProps}>
           <DashboardCharts
+            issueStatusCountDataIsFetched={issueStatusCountDataIsFetched}
             issuePriorityCountData={issuePriorityCountData}
             issueStatusCountData={issueStatusCountData}
             issueTypeCountData={issueTypeCountData}
+            issuePriorityCountDataIsFetched={issuePriorityCountDataIsFetched}
+            issueTypeCountDataIsFetched={issueTypeCountDataIsFetched}
           />
         </Col>
         <Col {...rightBottomColProps}>

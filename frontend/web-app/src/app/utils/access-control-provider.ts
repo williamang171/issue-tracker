@@ -6,44 +6,35 @@ import {
 export const canAccess = { can: true };
 export const cannotAccess = { can: false, reason: ' ' };
 
-export const fetchRoleAndSaveToCache = async (accessToken?: string) => {
-  if (!accessToken) {
-    return;
-  }
-  await fetch(`${API_URL}/users/getCurrentUserRole`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: `Bearer ${accessToken}`,
-    },
-  })
-    .then(async (data) => {
-      const json = await data.json();
-      localStorage.setItem('role', json.roleCode);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-
-export const getRoleFromCache = async () => {
-  const maxRetries = 10;
-  const retryDelay = 500;
-  let role = localStorage.getItem('role');
+export const fetchRoleAndSaveToCache = async (accessToken: string, maxRetries = 10) => {
+  let role = null;
+  let retryDelay = 0;
   let retryCount = 0;
 
   while (!role && retryCount < maxRetries) {
-    await new Promise(resolve => setTimeout(resolve, retryDelay));
-    role = localStorage.getItem('role');
-    retryCount++;
+    try {
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+      const res = await fetch(`${API_URL}/users/getCurrentUserRole`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const json = await res.json();
+      role = json.roleCode;
+      retryCount++;
+      retryDelay = 500;
+    } catch (error) {
+      console.log(error);
+    }
   }
-
   return role;
 };
 
 export const accessControlProvider: AccessControlProvider = {
   can: async ({ action, params, resource }) => {
-    let role = await getRoleFromCache();
+    let role = localStorage.getItem("role");
     if (!role) {
       return cannotAccess;
     }

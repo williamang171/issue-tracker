@@ -8,9 +8,12 @@ import {
   Legend,
 } from 'recharts';
 import { Card } from 'antd';
+import { useChartShowEmpty } from '@hooks/useChartShowEmpty';
+import { EmptyPlaceholder } from './EmptyPlaceholder';
 
-export const ProjectPieChart = (props: { data: any[]; title: string }) => {
-  const { data, title } = props;
+export const ProjectPieChart = (props: { data: any[]; title: string, isFetched?: boolean }) => {
+  const { data, title, isFetched } = props;
+  const showEmpty = useChartShowEmpty(data, isFetched);
   return (
     <Card
       style={{ height: '400px', width: '100%', padding: 0 }}
@@ -39,7 +42,7 @@ export const ProjectPieChart = (props: { data: any[]; title: string }) => {
           width: '100%',
         }}
       >
-        <ResponsiveContainer width={300} height={300}>
+        {showEmpty ? <EmptyPlaceholder /> : <ResponsiveContainer width={300} height={300}>
           <PieChart width={300} height={300}>
             <Pie
               data={data}
@@ -55,7 +58,8 @@ export const ProjectPieChart = (props: { data: any[]; title: string }) => {
             <Tooltip />
             <Legend layout="vertical" align="center" verticalAlign="bottom" />
           </PieChart>
-        </ResponsiveContainer>
+        </ResponsiveContainer>}
+
       </div>
     </Card>
   );
