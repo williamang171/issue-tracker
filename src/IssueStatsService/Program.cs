@@ -21,10 +21,10 @@ var redisRetryPolicy = Policy
 redisRetryPolicy.ExecuteAndCapture(() =>
 {
     // Create the Redis connection
-    var connectionMultiplexer = ConnectionMultiplexer
-        .Connect(builder.Configuration.GetValue("Redis:Host", "localhost")!);
-    builder.Services
-    .AddSingleton<IConnectionMultiplexer>(connectionMultiplexer);
+    var redisConfiguration = $"{builder.Configuration.GetValue("Redis:Host", "localhost")},password={builder.Configuration.GetValue("Redis:Password", "redis_password")}";
+    var connectionMultiplexer = ConnectionMultiplexer.Connect(redisConfiguration);
+
+    builder.Services.AddSingleton<IConnectionMultiplexer>(connectionMultiplexer);
 });
 
 builder.Services.AddMassTransit(x =>

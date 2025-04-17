@@ -26,6 +26,11 @@ spec:
                 secretKeyRef:
                   name: rabbit-secret
                   key: password
+            - name: Redis__Password
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: password
           envFrom:
             - configMapRef:
                 name: issue-stats-svc-config

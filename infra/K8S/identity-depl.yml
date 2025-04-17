@@ -21,6 +21,11 @@ spec:
                 secretKeyRef:
                   name: identity-secret
                   key: connString
+            - name: UserSettings__DefaultPassword
+              valueFrom:
+                secretKeyRef:
+                  name: identity-secret
+                  key: userDefaultPassword
           envFrom:
             - configMapRef:
                 name: identity-svc-config

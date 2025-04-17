@@ -19,6 +19,7 @@ services:
       - "6379:6379"
     volumes:
       - /data
+    command: redis-server --requirepass redis_password
   project-issue-svc:
     image: w6731827/project-issue-svc:latest
     build:
@@ -30,7 +31,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
       - RabbitMQ__Host=rabbitmq
-      - ConnectionStrings__DefaultConnection=Server=postgres;User Id=postgres;Password=postgrespw;Database=projecttasks
+      - ConnectionStrings__DefaultConnection=Server=postgres;User Id=postgres;Password=postgrespw;Database=projectissues
       - IdentityServiceUrl=http://identity-svc
     ports:
       - 7003:80
@@ -48,6 +49,7 @@ services:
       - IssuerUri=http://localhost:5000
       - ClientApp=http://localhost:3000
       - ConnectionStrings__DefaultConnection=Server=postgres; User Id=postgres; Password=postgrespw; Database=identity
+      - UserSettings__DefaultPassword=Pass123$
     ports:
       - 5000:80
     depends_on:
@@ -89,6 +91,7 @@ services:
       - ASPNETCORE_URLS=http://+:80
       - RabbitMQ__Host=rabbitmq
       - Redis__Host=redis
+      - Redis__Password=redis_password
       - IdentityServiceUrl=http://identity-svc
     ports:
       - 7005:80
