@@ -202,7 +202,7 @@ export const CommentList = () => {
                 }}
               >
                 <Text style={{ fontWeight: 500 }}>{item.createdBy}</Text>
-                <Text size="xs">{formatTimestamp(item.createdTime)}</Text>
+                <Text size="xs">{formatTimestamp(item.updatedTime || item.createdTime)}</Text>
               </div>
 
               {id === item.id ? (

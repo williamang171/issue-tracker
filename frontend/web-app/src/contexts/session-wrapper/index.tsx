@@ -31,6 +31,7 @@ export const SessionWrapperContextProvider: React.FC<
   const { data, status } = useSession();
   const to = usePathname();
   const [role, setRole] = useState("");
+  const [showHome, setShowHome] = useState(false);
   const [mounted, setIsMounted] = useState(false);
   const { push } = useRouter();
 
@@ -60,11 +61,15 @@ export const SessionWrapperContextProvider: React.FC<
     }
     await fetchRoleAndSaveToCache(data?.accessToken)
       .then((roleCode: string | null | undefined) => {
-        if (typeof roleCode === 'string') {
+        if (roleCode) {
           setRole(roleCode);
           localStorage.setItem('role', roleCode);
         }
+        else {
+          setShowHome(true);
+        }
       }).catch((err) => {
+        setShowHome(true);
         console.error(err);
       });
   };
@@ -85,6 +90,10 @@ export const SessionWrapperContextProvider: React.FC<
 
   if (status === 'loading') {
     return <Loading />;
+  }
+
+  if (showHome) {
+    return <HomePage />;
   }
 
   if (status === 'authenticated' && !role) {
