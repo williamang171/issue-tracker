@@ -47,7 +47,7 @@ const HomePage = () => {
                     <Col xs={24} sm={24} md={24} lg={12}>
                         <div className="image-container" style={{ display: 'flex', justifyContent: 'center' }}>
                             <img
-                                src="undraw_online-collaboration_xon8.svg"
+                                src="undraw_accept-tasks_syrr.svg"
                                 alt="Issue tracker interface"
                                 style={{ maxWidth: '100%', height: 'auto' }}
                             />
