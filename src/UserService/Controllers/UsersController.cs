@@ -161,14 +161,14 @@ namespace UserService.Controllers
         // Default role for demo users
         private async Task<Role?> GetDefaultRoleForUserName(string userName)
         {
-            List<string> adminList = ["alice", "bob", "root", "demoadmin"];
+            List<string> adminList = ["alice", "root", "demoadmin"];
             if (adminList.Contains(userName))
             {
                 var adminRole = await _roleRepo.GetRoleEntityByCode("Admin");
                 return adminRole;
             }
 
-            List<string> memberList = ["demomember"];
+            List<string> memberList = ["demomember", "bob"];
             if (memberList.Contains(userName))
             {
                 var memberRole = await _roleRepo.GetRoleEntityByCode("Member");
