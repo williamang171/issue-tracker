@@ -2,8 +2,6 @@ import React from 'react';
 import { Layout, Typography, Row, Col, Space } from 'antd';
 import GetStartedButton from './GetStartedButton';
 import SignInButton from './SignInButton';
-import SignUpButton from './SignUpButton';
-
 
 const { Header, Content } = Layout;
 const { Title, Paragraph } = Typography;
@@ -19,7 +17,6 @@ const HomePage = () => {
                     </Typography.Title>
                 </div>
                 <Space>
-                    <SignUpButton />
                     <SignInButton />
                 </Space>
             </Header>
@@ -50,7 +47,7 @@ const HomePage = () => {
                     <Col xs={24} sm={24} md={24} lg={12}>
                         <div className="image-container" style={{ display: 'flex', justifyContent: 'center' }}>
                             <img
-                                src="undraw_online-collaboration_xon8.svg"
+                                src="undraw_accept-tasks_syrr.svg"
                                 alt="Issue tracker interface"
                                 style={{ maxWidth: '100%', height: 'auto' }}
                             />

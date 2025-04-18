@@ -8,15 +8,12 @@ import { ISSUE_STATUS } from '@app/constants/issue-status';
 import { ISSUE_PRIORITY } from '@app/constants/issue-priority';
 import { ISSUE_TYPE } from '@app/constants/issue-type';
 import { useParams, useSearchParams } from 'next/navigation';
-import { mockIssueStatusCountData } from '@mocks/mock-project-chart-data/mock-issue-status-count-data';
-import { mockIssuePriorityCountData } from '@mocks/mock-project-chart-data/mock-issue-priority-count-data';
-import { mockIssueTypeCountData } from '@mocks/mock-project-chart-data/mock-issue-type-count-data';
 
 export const useGetProjectChartsData = () => {
     const { id } = useParams();
     const projectId = (Array.isArray(id) ? id[0] : id);
 
-    const { data: issueStatusCountData } = useOne<
+    const { data: issueStatusCountData, isFetched: issueStatusCountDataIsFetched } = useOne<
         {
             key: number;
             value: number;
@@ -26,7 +23,7 @@ export const useGetProjectChartsData = () => {
         id: projectId,
     });
 
-    const { data: issuePriorityCountData } = useOne<
+    const { data: issuePriorityCountData, isFetched: issuePriorityCountDataIsFetched } = useOne<
         {
             key: number;
             value: number;
@@ -36,7 +33,7 @@ export const useGetProjectChartsData = () => {
         id: projectId,
     });
 
-    const { data: issueTypeCountData } = useOne<
+    const { data: issueTypeCountData, isFetched: issueTypeCountDataIsFetched } = useOne<
         {
             key: number;
             value: number;
@@ -45,17 +42,6 @@ export const useGetProjectChartsData = () => {
         resource: RESOURCE.dashboardIssuesTypeCount,
         id: projectId,
     });
-
-    // TODO: replace with actual data
-    // const issueStatusCountData = {
-    //     data: mockIssueStatusCountData
-    // };
-    // const issuePriorityCountData = {
-    //     data: mockIssuePriorityCountData
-    // };
-    // const issueTypeCountData = {
-    //     data: mockIssueTypeCountData
-    // };
 
     const issueStatusCountDataForChart = useMemo(() => {
         if (!issueStatusCountData) {
@@ -111,10 +97,12 @@ export const useGetProjectChartsData = () => {
         });
     }, [issueTypeCountData]);
 
-    // TODO: return actual data
     return {
         issueStatusCountData: issueStatusCountDataForChart,
+        issueStatusCountDataIsFetched: issueStatusCountDataIsFetched,
         issuePriorityCountData: issuePriorityCountDataForChart,
+        issuePriorityCountDataIsFetched: issuePriorityCountDataIsFetched,
         issueTypeCountData: issueTypeCountDataForChart,
+        issueTypeCountDataIsFetched: issueTypeCountDataIsFetched,
     };
 };

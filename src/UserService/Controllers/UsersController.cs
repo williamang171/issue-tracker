@@ -158,14 +158,21 @@ namespace UserService.Controllers
             return BadRequest("Failed to update user:sync");
         }
 
-        // Return specific role for reserved usernames
+        // Default role for demo users
         private async Task<Role?> GetDefaultRoleForUserName(string userName)
         {
-            List<string> userList = ["alice", "bob", "root"];
-            if (userList.Contains(userName))
+            List<string> adminList = ["alice", "bob", "root", "demoadmin"];
+            if (adminList.Contains(userName))
             {
                 var adminRole = await _roleRepo.GetRoleEntityByCode("Admin");
                 return adminRole;
+            }
+
+            List<string> memberList = ["demomember"];
+            if (memberList.Contains(userName))
+            {
+                var memberRole = await _roleRepo.GetRoleEntityByCode("Member");
+                return memberRole;
             }
 
             var viewerRole = await _roleRepo.GetRoleEntityByCode("Viewer");

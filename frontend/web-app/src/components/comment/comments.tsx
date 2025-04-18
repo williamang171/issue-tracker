@@ -101,10 +101,7 @@ export const CommentForm = () => {
         padding: '1rem',
       }}
     >
-      <CustomAvatar
-        style={{ flexShrink: 0 }}
-        name={data?.user?.username}
-      />
+      <CustomAvatar style={{ flexShrink: 0 }} name={data?.user?.username} />
       <Form {...formProps} style={{ width: '100%' }} onFinish={handleOnFinish}>
         <Form.Item
           name="content"
@@ -170,7 +167,7 @@ export const CommentList = () => {
   });
 
   const { data: userData } = useSession();
-  const { isAdmin, isMember } = useGetUserRole();
+  const { isAdmin, isMember, isReadOnly } = useGetUserRole();
   const username = userData?.user.username;
 
   return (
@@ -205,7 +202,7 @@ export const CommentList = () => {
                 }}
               >
                 <Text style={{ fontWeight: 500 }}>{item.createdBy}</Text>
-                <Text size="xs">{formatTimestamp(item.createdTime)}</Text>
+                <Text size="xs">{formatTimestamp(item.updatedTime || item.createdTime)}</Text>
               </div>
 
               {id === item.id ? (
@@ -245,8 +242,8 @@ export const CommentList = () => {
                   {item.content}
                 </Typography.Paragraph>
               )}
-              <Space size={0} >
-                {isMe && !id && (
+              <Space size={0}>
+                {isMe && !id && !isReadOnly && (
                   <Typography.Link
                     type="secondary"
                     style={{
@@ -258,7 +255,7 @@ export const CommentList = () => {
                     Edit
                   </Typography.Link>
                 )}
-                {((isMe || isAdmin) && !id) && (
+                {(isMe || isAdmin) && !isReadOnly && !id && (
                   <DeleteButton
                     accessControl={{ enabled: true }}
                     disabled={false}
@@ -276,7 +273,7 @@ export const CommentList = () => {
                     className="ant-typography secondary"
                     style={{
                       fontSize: '12px',
-                      paddingLeft: 0
+                      paddingLeft: 0,
                     }}
                   />
                 )}

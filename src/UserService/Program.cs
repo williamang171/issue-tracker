@@ -5,6 +5,8 @@ using MassTransit;
 using UserService.Middlewares;
 using Microsoft.AspNetCore.Authorization;
 using UserService.AuthorizationHandler;
+using Polly;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,13 +62,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-try
-{
-    await DbInitializer.InitDb(app);
-}
-catch (Exception e)
-{
-    Console.WriteLine(e);
-}
+var retryPolicy = Policy
+    .Handle<NpgsqlException>()
+    .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(5));
+
+retryPolicy.ExecuteAndCapture(() => DbInitializer.InitDb(app));
 
 app.Run();

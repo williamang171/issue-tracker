@@ -13,58 +13,64 @@ import { useGetUserRole } from '@hooks/useGetUserRole';
 import { AuditFields } from '@components/fields/audit-fields';
 
 export default function ProjectEdit() {
-  const { formProps, saveButtonProps, query: queryResult, formLoading } = useForm({
-    redirect: false
+  const {
+    formProps,
+    saveButtonProps,
+    query: queryResult,
+    formLoading,
+  } = useForm({
+    redirect: false,
   });
 
   const { isAdmin } = useGetUserRole();
 
-  const { issuePriorityCountData, issueStatusCountData, issueTypeCountData } =
+  const { issuePriorityCountData, issueStatusCountData, issueTypeCountData, issueStatusCountDataIsFetched, issuePriorityCountDataIsFetched, issueTypeCountDataIsFetched } =
     useGetProjectChartsData();
-  const isDesktop = useMediaQuery({ minWidth: 768 });
+  const isDesktop = useMediaQuery({ minWidth: 1200 });
 
   if (queryResult?.status === 'error') {
     return <Alert type="error" message="Not Found" />;
   }
 
-  const leftColProps = {
-    xl: 10,
-    lg: 14,
-    md: 24,
-    sm: 24,
-    xs: 24
-  };
-  const rightColProps = {
-    xl: 14,
-    lg: 10,
-    md: 24,
-    sm: 24,
-    xs: 24
-  };
   const leftTopColProps = {
-    ...leftColProps,
+    xl: 8,
     lg: 24,
+    md: 24,
+    sm: 24,
+    xs: 24,
   };
   const rightTopColProps = {
-    ...rightColProps,
-    lg: 24
-  }
+    xl: 16,
+    lg: 24,
+    md: 24,
+    sm: 24,
+    xs: 24,
+  };
+  const leftBottomColProps = {
+    xl: 12,
+    lg: 24,
+    md: 24,
+    sm: 24,
+    xs: 24,
+  };
+  const rightBottomColProps = {
+    xl: 12,
+    lg: 24,
+    md: 24,
+    sm: 24,
+    xs: 24,
+  };
 
   return (
     <div>
       <Row gutter={[24, 24]}>
-        <Col {...leftTopColProps} >
+        <Col {...leftTopColProps}>
           <Edit
-            title={
-              <GoBack
-                title='Project Details'
-                href='/projects'
-              />
-            }
+            title={<GoBack title="Project Details" href="/projects" />}
             breadcrumb={false}
             saveButtonProps={{
               ...saveButtonProps,
-              disabled: !isAdmin || formLoading
+              disabled: !isAdmin || formLoading,
             }}
             isLoading={formLoading || queryResult?.status === 'loading'}
             headerButtons={<div />}
@@ -106,22 +112,21 @@ export default function ProjectEdit() {
             </>
           ) : null}
         </Col>
-        <Col
-          {...leftColProps}
-
-        >
+        <Col {...leftBottomColProps}>
           <DashboardCharts
+            issueStatusCountDataIsFetched={issueStatusCountDataIsFetched}
             issuePriorityCountData={issuePriorityCountData}
             issueStatusCountData={issueStatusCountData}
             issueTypeCountData={issueTypeCountData}
+            issuePriorityCountDataIsFetched={issuePriorityCountDataIsFetched}
+            issueTypeCountDataIsFetched={issueTypeCountDataIsFetched}
           />
         </Col>
-        <Col {...rightColProps}>
+        <Col {...rightBottomColProps}>
           {queryResult?.data?.data.id ? (
             <UsersList projectId={queryResult?.data?.data.id} />
           ) : null}
         </Col>
-
       </Row>
 
       <div style={{ marginBottom: '24px' }} />

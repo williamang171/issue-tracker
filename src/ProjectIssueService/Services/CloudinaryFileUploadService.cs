@@ -1,12 +1,6 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using ProjectIssueService.DTOs;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-
 
 namespace ProjectIssueService.Services
 {

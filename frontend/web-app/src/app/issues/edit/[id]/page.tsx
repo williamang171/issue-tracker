@@ -43,7 +43,7 @@ export default function IssueEdit() {
       unassignUser: values.assignee === undefined,
     });
   };
-  const { isAdmin, isReadOnly } = useGetUserRole();
+  const { isAdmin, isReadOnly, isMember } = useGetUserRole();
 
   if (queryResult?.status === 'error') {
     return <Alert type="error" message="Not Found" />;
@@ -53,7 +53,7 @@ export default function IssueEdit() {
     <div>
       <Edit
         deleteButtonProps={{
-          disabled: !isAdmin && queryResult?.data?.data.createdBy !== data?.user.username
+          disabled: isReadOnly || (isMember && queryResult?.data?.data.createdBy !== data?.user.username),
         }}
         saveButtonProps={{
           ...saveButtonProps,

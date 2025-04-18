@@ -5,6 +5,23 @@ import { GoBack } from '@components/goback';
 import { useGetUserRole } from '@hooks/useGetUserRole';
 import { Edit, useForm, useSelect } from '@refinedev/antd';
 import { Alert, Form, Input, Select, Switch } from 'antd';
+import { useMemo } from 'react';
+import orderBy from 'lodash/orderBy';
+
+const roleOrder = [
+  {
+    label: "Viewer",
+    order: 1
+  },
+  {
+    label: "Member",
+    order: 2
+  },
+  {
+    label: "Admin",
+    order: 3
+  }
+];
 
 export default function UserEdit() {
   const { formProps, saveButtonProps, formLoading, query: queryResult, } = useForm({});
@@ -12,8 +29,21 @@ export default function UserEdit() {
   const { selectProps: roleSelectProps } = useSelect({
     resource: 'roles',
     optionLabel: 'name',
-    optionValue: 'id',
+    optionValue: 'id'
   });
+
+  const formattedOptions = useMemo(() => {
+    if (Array.isArray(roleSelectProps.options)) {
+      const mapped = roleSelectProps.options.map(o => {
+        return {
+          ...o,
+          order: roleOrder.find(ro => ro.label === o.label)?.order
+        }
+      });
+      return orderBy(mapped, ["order"]);
+    }
+    return roleSelectProps.options;
+  }, [roleSelectProps.options]);
 
   const { isAdmin } = useGetUserRole();
   if (!isAdmin) {
@@ -60,7 +90,7 @@ export default function UserEdit() {
               },
             ]}
           >
-            <Select {...roleSelectProps} />
+            <Select {...roleSelectProps} options={formattedOptions} />
           </Form.Item>
           <Form.Item label={'Is Active'} name={'isActive'}>
             <Switch />

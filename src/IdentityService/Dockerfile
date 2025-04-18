@@ -5,9 +5,13 @@ EXPOSE 80
 # copy all .csproj files and restore as distinct layers.  Use the same COPY
 # for every dockerfile in the project to take advantage of Docker caching
 COPY IssueTracker.sln IssueTracker.sln
+COPY src/Contracts/Contracts.csproj src/Contracts/Contracts.csproj
 COPY src/GatewayService/GatewayService.csproj src/GatewayService/GatewayService.csproj
 COPY src/IdentityService/IdentityService.csproj src/IdentityService/IdentityService.csproj
 COPY src/ProjectIssueService/ProjectIssueService.csproj src/ProjectIssueService/ProjectIssueService.csproj
+COPY src/IssueStatsService/IssueStatsService.csproj src/IssueStatsService/IssueStatsService.csproj
+COPY src/UserService/UserService.csproj src/UserService/UserService.csproj
+COPY tests/ProjectIssueService.UnitTests/ProjectIssueService.UnitTests.csproj tests/ProjectIssueService.UnitTests/ProjectIssueService.UnitTests.csproj
 
 # Restore package deps
 RUN dotnet restore IssueTracker.sln

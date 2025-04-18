@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   PieChart,
   Pie,
@@ -14,9 +14,13 @@ import {
 } from 'recharts';
 
 import { Card } from 'antd';
+import { EmptyPlaceholder } from './EmptyPlaceholder';
+import { useChartShowEmpty } from '@hooks/useChartShowEmpty';
 
-export const ProjectBarChart = (props: { data: any[]; title: string }) => {
-  const { data, title } = props;
+export const ProjectBarChart = (props: { data: any[]; title: string, isFetched?: boolean }) => {
+  const { data, title, isFetched } = props;
+  const showEmpty = useChartShowEmpty(data, isFetched);
+
   return (
     <Card
       style={{ height: '400px', width: '100%', padding: 0 }}
@@ -37,7 +41,7 @@ export const ProjectBarChart = (props: { data: any[]; title: string }) => {
         >
           <div>{title}</div>
         </div>
-        <ResponsiveContainer width="100%" height={300}>
+        {showEmpty ? <EmptyPlaceholder /> : <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data} margin={{ top: 80, right: 40 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
@@ -50,7 +54,8 @@ export const ProjectBarChart = (props: { data: any[]; title: string }) => {
               ))}
             </Bar>
           </BarChart>
-        </ResponsiveContainer>
+        </ResponsiveContainer>}
+
       </div>
     </Card>
   );

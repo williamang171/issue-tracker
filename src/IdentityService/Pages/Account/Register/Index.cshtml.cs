@@ -49,6 +49,14 @@ namespace IdentityService.Pages.Register
 
                     RegisterSuccess = true;
                 }
+                else
+                {
+                    // Add each error to the ModelState to display on the page
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
 
             return Page();

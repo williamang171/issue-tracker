@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@ant-design/colors": "^8.0.0",
-    "casbin": "^5.38.0"
-  }
-}

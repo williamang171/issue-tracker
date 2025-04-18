@@ -5,9 +5,7 @@ import Link from "next/link"
 export const GoBack = ({ title, href }: { title: string, href: string }) => {
     return (
         <div style={{ display: 'flex' }}>
-            <Link
-                href={href}
-            >
+            <Link href={href}  >
                 <Button type="text" icon={<LeftOutlined />} />
             </Link>
             <div style={{ marginLeft: "24px" }} >

@@ -16,11 +16,13 @@ type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 const beforeUpload = (file: FileType) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isJpgOrPng) {
-        message.error('You can only upload JPG/PNG file!');
+        message.error('You can only upload images!');
+        return false;
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-        message.error('Image must smaller than 2MB!');
+        message.error('File size must smaller than 2MB!');
+        return false;
     }
     return isJpgOrPng && isLt2M;
 };
