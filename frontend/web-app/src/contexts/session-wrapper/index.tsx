@@ -74,7 +74,6 @@ export const SessionWrapperContextProvider: React.FC<
         console.error(err);
       });
   };
-
   useEffect(() => {
     if (data?.accessToken) {
       fetchRole();
