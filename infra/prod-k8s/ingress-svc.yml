@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: ingress-svc
   annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     kubernetes.io/ingress.class: "nginx"
   labels:
     name: ingress-svc
@@ -10,12 +11,12 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - app.issuetracker.local
-        - api.issuetracker.local
-        - id.issuetracker.local
-      secretName: issuetracker-app-tls
+        - app.issuetracker.space
+        - api.issuetracker.space
+        - id.issuetracker.space
+      secretName: issuetracker-tls
   rules:
-    - host: app.issuetracker.local
+    - host: app.issuetracker.space
       http:
         paths:
           - pathType: Prefix
@@ -25,7 +26,7 @@ spec:
                 name: webapp-clusterip
                 port:
                   number: 3000
-    - host: api.issuetracker.local
+    - host: api.issuetracker.space
       http:
         paths:
           - pathType: Prefix
@@ -35,7 +36,7 @@ spec:
                 name: gateway-clusterip
                 port:
                   number: 80
-    - host: id.issuetracker.local
+    - host: id.issuetracker.space
       http:
         paths:
           - pathType: Prefix

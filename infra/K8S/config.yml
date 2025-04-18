@@ -38,7 +38,7 @@ metadata:
   name: gateway-svc-config
 data:
   ASPNETCORE_URLS: http://+:80
-  ClientApp: https://app.issuetracker.local
+  ClientApp: https://app.issuetracker.space
   IdentityServiceUrl: http://identity-clusterip
 ---
 apiVersion: v1
@@ -47,16 +47,16 @@ metadata:
   name: identity-svc-config
 data:
   ASPNETCORE_URLS: http://+:80
-  IssuerUri: https://id.issuetracker.local
-  ClientApp: https://app.issuetracker.local
+  IssuerUri: https://id.issuetracker.space
+  ClientApp: https://app.issuetracker.space
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: webapp-svc-config
 data:
-  AUTH_URL: https://app.issuetracker.local
+  AUTH_URL: https://app.issuetracker.space
   AUTH_URL_INTERNAL: http://webapp-clusterip:3000
   API_URL_INTERNAL: http://gateway-clusterip/api
-  ID_URL: https://id.issuetracker.local
+  ID_URL: https://id.issuetracker.space
   ID_URL_INTERNAL: http://identity-clusterip

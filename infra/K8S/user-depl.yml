@@ -14,7 +14,6 @@ spec:
       containers:
         - name: user-svc
           image: w6731827/user-svc:latest
-          imagePullPolicy: Never
           env:
             - name: ConnectionStrings__DefaultConnection
               valueFrom:
