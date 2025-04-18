@@ -6,7 +6,7 @@ import {
 export const canAccess = { can: true };
 export const cannotAccess = { can: false, reason: ' ' };
 
-export const fetchRoleAndSaveToCache = async (accessToken: string, maxRetries = 10) => {
+export const fetchRoleWithRetry = async (accessToken: string, maxRetries = 5) => {
   let role = null;
   let retryDelay = 0;
   let retryCount = 0;
@@ -25,8 +25,8 @@ export const fetchRoleAndSaveToCache = async (accessToken: string, maxRetries = 
       role = json.roleCode;
       retryCount++;
       retryDelay = 500;
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   }
   return role;

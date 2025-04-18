@@ -7,8 +7,8 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { useSession } from "next-auth/react";
-import { fetchRoleAndSaveToCache } from "@app/utils/access-control-provider";
+import { useSession, signOut } from "next-auth/react";
+import { fetchRoleWithRetry } from "@app/utils/access-control-provider";
 import Loading from "@components/loading/Loading";
 import { usePathname, useRouter } from "next/navigation";
 import HomePage from "@components/home";
@@ -31,8 +31,6 @@ export const SessionWrapperContextProvider: React.FC<
   const { data, status } = useSession();
   const to = usePathname();
   const [role, setRole] = useState("");
-  const [showHome, setShowHome] = useState(false);
-  const [mounted, setIsMounted] = useState(false);
   const { push } = useRouter();
 
   axiosInstance.interceptors.request.clear();
@@ -56,56 +54,50 @@ export const SessionWrapperContextProvider: React.FC<
     if (!data?.accessToken) {
       return;
     }
-    if (!mounted) {
-      return;
-    }
-    await fetchRoleAndSaveToCache(data?.accessToken)
+    await fetchRoleWithRetry(data?.accessToken)
       .then((roleCode: string | null | undefined) => {
         if (roleCode) {
           setRole(roleCode);
           localStorage.setItem('role', roleCode);
         }
         else {
-          setShowHome(true);
+          signOut({
+            redirect: true,
+            redirectTo: '/',
+          });
         }
       }).catch((err) => {
-        setShowHome(true);
+        signOut({
+          redirect: true,
+          redirectTo: '/',
+        });
         console.error(err);
       });
   };
 
   useEffect(() => {
-    setIsMounted(true);
-  }, [])
-
-  useEffect(() => {
-    fetchRole();
-  }, [data?.accessToken, mounted]);
-
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      push('/');
+    if (data?.accessToken) {
+      fetchRole();
     }
-  }, [status])
+  }, [data?.accessToken]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated' && to !== '/') {
+      push('/');
+      return;
+    }
+  }, [status, to])
 
   if (status === 'loading') {
     return <Loading />;
-  }
-
-  if (showHome) {
-    return <HomePage />;
   }
 
   if (status === 'authenticated' && !role) {
     return <Loading />;
   }
 
-  if (status !== 'authenticated' && to === '/') {
+  if (status === 'unauthenticated' && to === '/') {
     return <HomePage />;
-  }
-
-  if (status === 'unauthenticated') {
-    return <Loading />
   }
 
   return (

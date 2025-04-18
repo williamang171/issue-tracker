@@ -8,11 +8,9 @@ import routerProvider from '@refinedev/nextjs-router';
 import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import { ColorModeContextProvider } from '@contexts/color-mode';
 import {
-  API_URL,
   dataProvider,
 } from '@providers/data-provider/data-provider.client';
 import '@refinedev/antd/dist/reset.css';
-import { axiosInstance } from './utils/axios-instance';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   ProjectOutlined,
@@ -20,8 +18,7 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import Loading from '@components/loading/Loading';
-import { accessControlProvider, fetchRoleAndSaveToCache } from './utils/access-control-provider';
-import HomePage from '@components/home';
+import { accessControlProvider } from './utils/access-control-provider';
 import { SessionWrapperContextProvider } from '@contexts/session-wrapper';
 
 type RefineContextProps = {
