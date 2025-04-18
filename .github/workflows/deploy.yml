@@ -63,7 +63,7 @@ jobs:
           push: true
           tags: ${{matrix.service.name}}:latest
           build-args: |
-            ${{ matrix.service.path == 'frontend/web-app' && format('NEXT_PUBLIC_API_URL={0}', secrets.NEXT_PUBLIC_API_URL) || 'http://localhost:6001/api' }}
+            NEXT_PUBLIC_API_URL=${{secrets.NEXT_PUBLIC_API_URL}}
 
   apply-k8s:
     needs: build-and-push
