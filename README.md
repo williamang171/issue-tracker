@@ -50,7 +50,7 @@ docker compose up -d
 
 ## Development
 
-If you would like to make adjustments this application, you can follow the instructions below
+If you would like to make adjustments to this application, you can follow the instructions below
 
 1. Complete step 1 to step 4 of docker compose section [here](#getting-started)
 
