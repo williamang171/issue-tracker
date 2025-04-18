@@ -486,3 +486,6 @@ $RECYCLE.BIN/
 
 # K8s production secrets
 infra/prod-k8s/prod-secrets.yml
+
+# devcerts
+infra/devcerts
