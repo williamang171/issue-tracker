@@ -3,7 +3,7 @@ name: Build and publish
 on:
   workflow_dispatch:
   push:
-    branches: ["main", "feat/deploy"]
+    branches: ["main"]
 
 jobs:
   build-and-push:
@@ -33,15 +33,15 @@ jobs:
         with:
           fetch-depth: 2
 
-      # - name: Check for changes in service path
-      #   run: |
-      #     if git diff --quiet HEAD^ HEAD -- ${{matrix.service.path}}; then
-      #       echo "No changes in ${{matrix.service.path}}. Skipping build"
-      #       echo "continue=false" >> $GITHUB_ENV
-      #     else
-      #       echo "Changes detected in ${{matrix.service.path}}. Proceeding with build"
-      #       echo "continue=true" >> $GITHUB_ENV
-      #     fi
+      - name: Check for changes in service path
+        run: |
+          if git diff --quiet HEAD^ HEAD -- ${{matrix.service.path}}; then
+            echo "No changes in ${{matrix.service.path}}. Skipping build"
+            echo "continue=false" >> $GITHUB_ENV
+          else
+            echo "Changes detected in ${{matrix.service.path}}. Proceeding with build"
+            echo "continue=true" >> $GITHUB_ENV
+          fi
 
       - name: Set up Docker buildx
         if: env.continue == 'true'
@@ -65,20 +65,21 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=${{secrets.NEXT_PUBLIC_API_URL}}
 
-  apply-k8s:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # Enable this for automated deployment to DO
+  # apply-k8s:
+  #   needs: build-and-push
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+  #     - name: Install doctl
+  #       uses: digitalocean/action-doctl@v2
+  #       with:
+  #         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Save DigitalOcean kubeconfig
-        run: doctl kubernetes cluster kubeconfig save issuetracker
+  #     - name: Save DigitalOcean kubeconfig
+  #       run: doctl kubernetes cluster kubeconfig save issuetracker
 
-      - name: Apply the K8S deployments
-        run: kubectl apply -f infra/K8S && kubectl apply -f infra/prod-k8s
+  #     - name: Apply the K8S deployments
+  #       run: kubectl apply -f infra/K8S && kubectl apply -f infra/prod-k8s
