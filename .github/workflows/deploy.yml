@@ -46,6 +46,9 @@ jobs:
       - name: Set up Docker buildx
         if: env.continue == 'true'
         uses: docker/setup-buildx-action@v2
+        with:
+          build-args: |
+            ${{ matrix.service.path == 'frontend/web-app' && format('NEXT_PUBLIC_API_URL={0}', secrets.NEXT_PUBLIC_API_URL) || 'http://localhost:6001/api' }}
 
       - name: Login to Docker
         if: env.continue == 'true'
