@@ -22,9 +22,9 @@ cd issue-tracker
 ```
 3. Download docker and docker desktop, you can install these tools and review installation instructions for your Operating System [here](https://docs.docker.com/desktop/)
 
-4. (Optional) If you want to upload attachments, create `src/ProjectIssueService/.env` and provide `CLOUDINARY_URL`, replace `your_cloudinary_url` with actual URL, you can refer to [here](https://cloudinary.com/documentation/dotnet_quickstart) for instructions
+4. (Optional) If you want to upload attachments, create `src/ProjectIssueService/.env` with the following code and replace `cloudinary_url` with the actual URL, you can refer to [here](https://cloudinary.com/documentation/dotnet_quickstart) for instructions
 ```
-CLOUDINARY_URL=<your_cloudinary_url>
+CLOUDINARY_URL=cloudinary_url
 ```
 
 5. Build the services locally on your computer by running (NOTE: this may take several minutes to complete):
