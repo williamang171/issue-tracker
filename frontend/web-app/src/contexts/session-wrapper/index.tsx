@@ -31,6 +31,7 @@ export const SessionWrapperContextProvider: React.FC<
   const { data, status } = useSession();
   const to = usePathname();
   const [role, setRole] = useState("");
+  const [fetchingRole, setFetchingRole] = useState(false);
   const { push } = useRouter();
 
   axiosInstance.interceptors.request.clear();
@@ -54,8 +55,13 @@ export const SessionWrapperContextProvider: React.FC<
     if (!data?.accessToken) {
       return;
     }
+    if (fetchingRole) {
+      return;
+    }
+    setFetchingRole(true);
     await fetchRoleWithRetry(data?.accessToken)
       .then((roleCode: string | null | undefined) => {
+        setFetchingRole(false);
         if (roleCode) {
           setRole(roleCode);
           localStorage.setItem('role', roleCode);
@@ -67,6 +73,7 @@ export const SessionWrapperContextProvider: React.FC<
           });
         }
       }).catch((err) => {
+        setFetchingRole(false);
         signOut({
           redirect: true,
           redirectTo: '/',
