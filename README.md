@@ -75,7 +75,11 @@ docker compose stop
 docker compose up -d
 ```
 
-7. Run the frontend application
+7. Create `frontend/web-app/.env.local` file for the frontend application
+
+Copy over the content from .env.example
+
+8. Run the frontend application
 
 ```
 cd frontend/web-app
@@ -83,14 +87,14 @@ npm install
 npm run dev
 ```
 
-8. Build the Contracts project
+9. Build the Contracts project
 
 ```
 cd src/Contracts
 dotnet build
 ```
 
-9. Run the backend projects `GatewayService`, `IdentityService`, `IssueStatsService`, `ProjectIssueService`, `UserService`
+10. Run the backend projects `GatewayService`, `IdentityService`, `IssueStatsService`, `ProjectIssueService`, `UserService`
 
 - Running all the services at once (for VSCode)
     - Run `Show all commands`
