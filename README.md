@@ -2,12 +2,12 @@
 
 A simple and effective tool to track and manage issues in your projects
 
-Diagram WIP
 
-![project-list](/documentation/images/project-list.png)
-![project-details](/documentation/images/project-details.png)
-![issue-list](/documentation/images/issue-list.png)
-![issue-details](/documentation/images/issue-details.png)
+![architecture](/documentation/architecture/architecture.drawio.png)
+![project-list](/documentation/screenshots/project-list.png)
+![project-details](/documentation/screenshots/project-details.png)
+![issue-list](/documentation/screenshots/issue-list.png)
+![issue-details](/documentation/screenshots/issue-details.png)
 
 ## Getting Started
 
