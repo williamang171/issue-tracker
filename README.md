@@ -2,12 +2,15 @@
 
 A simple and effective tool to track and manage issues in your projects
 
-
-![architecture](/documentation/architecture/architecture.drawio.png)
-![project-list](/documentation/screenshots/project-list.png)
 ![project-details](/documentation/screenshots/project-details.png)
-![issue-list](/documentation/screenshots/issue-list.png)
-![issue-details](/documentation/screenshots/issue-details.png)
+
+## Table of Contents
+- [Getting Started](#getting-started)
+- [Development](#development)
+- [Architecture](#architecture)
+- [Screenshots](#screenshots)
+- [License](#license)
+
 
 ## Getting Started
 
@@ -105,6 +108,15 @@ dotnet build
 
 > [!IMPORTANT]
 > Note that after updating the code of the service it is required to restart it
+
+
+## Architecture
+
+![architecture](/documentation/architecture/architecture.drawio.png)
+
+## Screenshots
+
+You can go to [here](documentation/screenshots/README.md) to view more screenshots
 
 ## License
 
