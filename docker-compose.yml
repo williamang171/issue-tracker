@@ -49,7 +49,7 @@ services:
       - IssuerUri=http://localhost:5000
       - ClientApp=http://localhost:3000
       - ConnectionStrings__DefaultConnection=Server=postgres; User Id=postgres; Password=postgrespw; Database=identity
-      - UserSettings__DefaultPassword=Pass123$
+      - UserSettings__DefaultPassword=Pass123#
     ports:
       - 5000:80
     depends_on:

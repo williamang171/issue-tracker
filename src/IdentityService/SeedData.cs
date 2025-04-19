@@ -37,7 +37,7 @@ public class SeedData
         ("demomember", "demomember@example.com", "Demo Member"),
         ("demoviewer", "demoviewer@example.com", "Demo Viewer")
     };
-        var defaultPassword = app.Configuration["UserSettings:DefaultPassword"] ?? "Pass123$";
+        var defaultPassword = app.Configuration["UserSettings:DefaultPassword"] ?? "Pass123#";
 
         // Create or verify each user
         foreach (var (username, email, displayName) in usersToCreate)
