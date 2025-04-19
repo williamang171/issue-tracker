@@ -125,7 +125,7 @@ dotnet build
 
 ## Screenshots
 
-You can go to [here](documentation/screenshots/README.md) to view more screenshots
+You can go to [here](documentation/screenshots/README.md) to view screenshots taken for the application
 
 ## License
 
