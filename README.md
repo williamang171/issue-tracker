@@ -75,9 +75,7 @@ docker compose stop
 docker compose up -d
 ```
 
-7. Create `frontend/web-app/.env.local` file for the frontend application
-
-Copy over the content from .env.example
+7. Create `frontend/web-app/.env.local` file for the frontend application, copy over the content from `frontend/web-app/.env.example`
 
 8. Run the frontend application
 
