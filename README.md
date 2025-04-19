@@ -5,12 +5,12 @@ A simple and effective tool to track and manage issues in your projects
 ![project-details](/documentation/screenshots/project-details.png)
 
 ## Table of Contents
+
 - [Getting Started](#getting-started)
 - [Development](#development)
 - [Architecture](#architecture)
 - [Screenshots](#screenshots)
 - [License](#license)
-
 
 ## Getting Started
 
@@ -19,37 +19,43 @@ A simple and effective tool to track and manage issues in your projects
 ```
 git clone https://github.com/williamang171/issue-tracker.git
 ```
+
 2. Change into the directory
+
 ```
 cd issue-tracker
 ```
+
 3. Download docker and docker desktop, you can install these tools and review installation instructions for your Operating System [here](https://docs.docker.com/desktop/)
 
-4. (Optional) If you want to upload attachments, create `src/ProjectIssueService/.env` with the following code and replace `cloudinary_url` with the actual URL, you can refer to [here](https://cloudinary.com/documentation/dotnet_quickstart) for instructions
-```
-CLOUDINARY_URL=cloudinary_url
-```
+4. Create `src/ProjectIssueService/.env` and copy over the content from `src/ProjectIssueService/.env.example`
 
-5. Build the services locally on your computer by running (NOTE: this may take several minutes to complete):
+5. (Optional) If you would like to use the attachments upload functionality, replace `cloudinary_url` in `src/ProjectIssueService/.env` with your own URL; You can refer to [here](https://cloudinary.com/documentation/dotnet_quickstart) for instructions
+
+6. Build the services locally on your computer by running (NOTE: this may take several minutes to complete):
+
 ```
 docker compose build
 ```
-6. Once this completes you can use the following to run the services:
+
+7. Once this completes you can use the following to run the services:
+
 ```
 docker compose up -d
 ```
-7. You should now be able to browse to the app on http://localhost:3000
 
-8. A few demo users have been added to the application, you can login with the following credentials
+8. You should now be able to browse to the app on http://localhost:3000
+
+9. A few demo users have been added to the application, you can sign in with the following credentials
 
 | Username   | Password | Role   |
-|------------|----------|--------|
-| root       | Pass123$ | Admin  |
-| demoadmin  | Pass123$ | Admin  |
-| alice      | Pass123$ | Admin  |
-| bob        | Pass123$ | Member |
-| demomember | Pass123$ | Member |
-| demoviewer | Pass123$ | Viewer |
+| ---------- | -------- | ------ |
+| root       | Pass123# | Admin  |
+| demoadmin  | Pass123# | Admin  |
+| alice      | Pass123# | Admin  |
+| bob        | Pass123# | Member |
+| demomember | Pass123# | Member |
+| demoviewer | Pass123# | Viewer |
 
 ## Development
 
@@ -92,25 +98,26 @@ cd src/Contracts
 dotnet build
 ```
 
-10. Run the backend projects `GatewayService`, `IdentityService`, `IssueStatsService`, `ProjectIssueService`, `UserService`
+10. Run the backend projects `GatewayService`, `IdentityService`, `IssueStatsService`, `ProjectIssueService`, `UserService` with the options shown
 
 - Running all the services at once (for VSCode)
-    - Run `Show all commands`
-        - `CTRL` + `Shift` + `P` for Windows / Linux
-        - `CMD` + `Shift` + `P` for MacOS
-    - `Tasks:Run Task` -> `dotnet run all services`
+
+  - Run `Show all commands`
+    - `CTRL` + `Shift` + `P` for Windows / Linux
+    - `Command` + `Shift` + `P` for MacOS
+  - `Tasks:Run Task` -> `dotnet run all services`
 
 - Running service individually (for VSCode)
-    - Run `Show all commands`
-    - `Tasks:Run Task` -> `dotnet run <service-name>`
+
+  - Run `Show all commands`
+  - `Tasks:Run Task` -> `dotnet run <service-name>`
 
 - Running service individually (command prompt / terminal)
-    - `cd src/<ProjectName>`
-    - `dotnet run --profile http`
+  - `cd src/<ProjectName>`
+  - `dotnet run --profile http`
 
 > [!IMPORTANT]
-> Note that after updating the code of the service it is required to restart it
-
+> After updating the code of the service, it is required to restart it for changes to take effect
 
 ## Architecture
 
