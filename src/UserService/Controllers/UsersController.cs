@@ -8,6 +8,7 @@ using MassTransit;
 using Contracts;
 using UserService.Helpers;
 using UserService.Extensions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace UserService.Controllers
 {
@@ -29,6 +30,10 @@ namespace UserService.Controllers
         public ActionResult<CurrentUserRoleDto> GetCurrentUserRole()
         {
             var userRole = HttpContext.GetUserRole();
+            if (userRole.IsNullOrEmpty())
+            {
+                return Unauthorized();
+            }
             return new CurrentUserRoleDto()
             {
                 RoleCode = userRole

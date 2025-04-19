@@ -2,29 +2,39 @@ import { AccessControlProvider } from '@refinedev/core';
 import {
   API_URL,
 } from '@providers/data-provider/data-provider.client';
+import axios from 'axios';
 
 export const canAccess = { can: true };
 export const cannotAccess = { can: false, reason: ' ' };
 
 export const fetchRoleWithRetry = async (accessToken: string, maxRetries = 5) => {
   let role = null;
-  let retryDelay = 0;
-  let retryCount = 0;
+  try {
+    const res = await axios.get(`${API_URL}/users/getCurrentUserRole`, {
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${accessToken}`,
+      },
+    });
+    role = res.data.roleCode;
+    return role;
+  } catch (err) {
+    console.log(err);
+  }
 
+  let retryDelay = 500;
+  let retryCount = 0;
   while (!role && retryCount < maxRetries) {
     try {
+      retryCount++;
       await new Promise(resolve => setTimeout(resolve, retryDelay));
-      const res = await fetch(`${API_URL}/users/getCurrentUserRole`, {
-        method: 'GET',
+      const res = await axios.get(`${API_URL}/users/getCurrentUserRole`, {
         headers: {
           'Content-Type': 'application/json',
           authorization: `Bearer ${accessToken}`,
         },
       });
-      const json = await res.json();
-      role = json.roleCode;
-      retryCount++;
-      retryDelay = 500;
+      role = res.data.roleCode;
     } catch (err) {
       console.log(err);
     }
